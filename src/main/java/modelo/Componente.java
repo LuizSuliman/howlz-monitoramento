@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Componente {
-    private enum Tipo {
+    public enum Tipo {
         CPU,
         RAM,
         DISCO,
@@ -44,5 +44,23 @@ public class Componente {
 
     public void setFkComputador(Integer fkComputador) {
         this.fkComputador = fkComputador;
+    }
+
+    public List<Monitoramento> getMonitoramentos() {
+        return monitoramentos;
+    }
+
+    public void setMonitoramentos(List<Monitoramento> monitoramentos) {
+        this.monitoramentos = monitoramentos;
+    }
+
+    @Override
+    public String toString() {
+        return "Componente{" +
+                "tipo=" + tipo +
+                ", modelo='" + modelo + '\'' +
+                ", fkComputador=" + fkComputador +
+                ", monitoramentos=" + monitoramentos +
+                '}';
     }
 }

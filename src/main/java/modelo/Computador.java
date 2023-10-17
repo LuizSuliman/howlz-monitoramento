@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Computador {
+    private Integer idComputador;
     public enum Status {
         LIGADO,
         DESLIGADO,
@@ -19,7 +20,7 @@ public class Computador {
     private List<Componente> componentes;
 
     public Computador() {
-
+        this.componentes = new ArrayList<>();
     }
     public Computador(String nome, String sistemaOperacional, String numeroSerial, String codigo, Status status, Integer fkEmpresa) {
         this.nome = nome;
@@ -30,6 +31,18 @@ public class Computador {
         this.status = status;
         this.fkEmpresa = fkEmpresa;
         this.componentes = new ArrayList<>();
+    }
+
+    public void adicionarComponente(Componente componente) {
+        this.componentes.add(componente);
+    }
+
+    public Integer getIdComputador() {
+        return idComputador;
+    }
+
+    public void setIdComputador(Integer idComputador) {
+        this.idComputador = idComputador;
     }
 
     public String getNome() {

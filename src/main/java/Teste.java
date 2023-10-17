@@ -47,8 +47,7 @@ public class Teste {
             System.out.println("Este computador ainda não está na nossa base de dados.\nQual o código que sua empresa usa para identificá-lo?");
             String codigo = in.next();
             howlz.cadastrarNovoComputador(usuarioLogado.getNome(), codigo);
+            howlz.cadastrarNovosComponentes(si.getHardware().getComputerSystem().getSerialNumber());
         }
-
-        System.out.println(computadorDao.buscarTodosPeloIdEmpresa(1));
     }
 }

@@ -30,11 +30,11 @@ public class ComputadorDao {
         return con.query("SELECT * FROM Computador WHERE idComputador = ?", new BeanPropertyRowMapper<>(Computador.class), idComputador);
     }
 
-    public List<Computador> buscarPeloSerial(String numeroSerial) {
+    public Computador buscarPeloSerial(String numeroSerial) {
         Conexao conexao = new Conexao();
         JdbcTemplate con = conexao.getConexaoDoBanco();
 
-        return con.query("SELECT * FROM Computador WHERE numeroSerial = ?", new BeanPropertyRowMapper<>(Computador.class), numeroSerial);
+        return con.queryForObject("SELECT * FROM Computador WHERE numeroSerial = ?", new BeanPropertyRowMapper<>(Computador.class), numeroSerial);
     }
 
     public Integer contarPeloSerial(String numeroSerial) {
