@@ -15,11 +15,19 @@ public class Componente {
     private String modelo;
     private Integer fkComputador;
     private List<Monitoramento> monitoramentos;
+    private String numeroSerial = null;
 
     public Componente() {
     }
 
     public Componente(Tipo tipo, String modelo, Integer fkComputador) {
+        this.tipo = tipo;
+        this.modelo = modelo;
+        this.fkComputador = fkComputador;
+        this.monitoramentos = new ArrayList<>();
+    }
+
+    public Componente(Tipo tipo, String modelo, Integer fkComputador, String serial) {
         this.tipo = tipo;
         this.modelo = modelo;
         this.fkComputador = fkComputador;
@@ -64,6 +72,14 @@ public class Componente {
 
     public void setMonitoramentos(List<Monitoramento> monitoramentos) {
         this.monitoramentos = monitoramentos;
+    }
+
+    public String getNumeroSerial() {
+        return numeroSerial;
+    }
+
+    public void setNumeroSerial(String numeroSerial) {
+        this.numeroSerial = numeroSerial;
     }
 
     @Override

@@ -22,6 +22,12 @@ public class Monitoramento {
     public Monitoramento() {
     }
 
+    public Monitoramento(Double valor, String tipo, Integer fkComponente) {
+        this.dataHora = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm:ss")));
+        this.valor = valor;
+        this.fkComponente = fkComponente;
+    }
+
     public Monitoramento(Double valor, Integer fkComponente) {
         this.dataHora = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm:ss")));
         this.valor = valor;
@@ -58,5 +64,16 @@ public class Monitoramento {
 
     public void setFkComponente(Integer fkComponente) {
         this.fkComponente = fkComponente;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Monitoramento{" +
+                "dataHora=" + dataHora +
+                ", valor=" + valor +
+                ", tipo='" + tipo + '\'' +
+                ", fkComponente=" + fkComponente +
+                '}';
     }
 }

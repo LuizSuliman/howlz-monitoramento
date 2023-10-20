@@ -12,7 +12,7 @@ public class ComponenteDao {
         Conexao conexao = new Conexao();
         JdbcTemplate con = conexao.getConexaoDoBanco();
 
-        con.update("INSERT INTO Componente (tipo, modelo, fkComputador) VALUES (?,?,?)", novoComponente.getTipo(), novoComponente.getModelo(), novoComponente.getFkComputador());
+        con.update("INSERT INTO Componente (tipo, modelo, fkComputador, numeroSerial) VALUES (?,?,?,?)", novoComponente.getTipo(), novoComponente.getModelo(), novoComponente.getFkComputador(), novoComponente.getNumeroSerial());
     }
 
     public List<Componente> buscarTodosPeloIdComputador(Integer idComputador) {
@@ -33,6 +33,6 @@ public class ComponenteDao {
         Conexao conexao = new Conexao();
         JdbcTemplate con = conexao.getConexaoDoBanco();
 
-        return con.queryForObject("SELECT serial FROM Componente WHERE tipo = 'DISCO' AND idComponente = ?", (Componente.class), id);
+        return con.queryForObject("SELECT numeroSerial FROM Componente WHERE tipo = 'DISCO' AND idComponente = ?", (Componente.class), id);
     }
 }

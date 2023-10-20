@@ -60,7 +60,7 @@ public class Howlz {
         DiscoGrupo discoGrupo = looca.getGrupoDeDiscos();
         List<Disco> discos = discoGrupo.getDiscos();
         for (Disco discoAtual : discos) {
-            Componente disco = new Componente(Componente.Tipo.DISCO, discoAtual.getModelo(), computador.getIdComputador());
+            Componente disco = new Componente(Componente.Tipo.DISCO, discoAtual.getModelo(), computador.getIdComputador(), discoAtual.getSerial());
             computador.adicionarComponente(disco);
             componenteDao.salvar(disco);
         }
@@ -112,6 +112,7 @@ public class Howlz {
                 break;
             default:
                 System.out.println("Tipo inválido");
+                break;
         }
 
     }
