@@ -1,10 +1,14 @@
 import com.github.britooo.looca.api.core.Looca;
+import dao.ComponenteDao;
 import dao.ComputadorDao;
 import dao.UsuarioDao;
+import modelo.Componente;
+import modelo.Computador;
 import modelo.Usuario;
 import oshi.SystemInfo;
 import servico.Howlz;
 
+import java.util.List;
 import java.util.Scanner;
 import java.util.TimerTask;
 
@@ -16,6 +20,7 @@ public class Teste {
         SystemInfo si = new SystemInfo();
         UsuarioDao usuarioDao = new UsuarioDao();
         ComputadorDao computadorDao = new ComputadorDao();
+        ComponenteDao componenteDao = new ComponenteDao();
 
         String continuarOuNao = "";
         Boolean cadastroValidado = false;
@@ -48,6 +53,12 @@ public class Teste {
             String codigo = in.next();
             howlz.cadastrarNovoComputador(usuarioLogado.getNome(), codigo);
             howlz.cadastrarNovosComponentes(si.getHardware().getComputerSystem().getSerialNumber());
+        }
+
+        Computador computador = computadorDao.buscarPeloSerial(si.getHardware().getComputerSystem().getSerialNumber());
+        List<Componente> componentes = componenteDao.buscarTodosPeloIdComputador(computador.getIdComputador());
+        for (Componente componente : componentes) {
+            howlz.monitorar(componente);
         }
     }
 }

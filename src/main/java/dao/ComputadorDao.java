@@ -12,8 +12,8 @@ public class ComputadorDao {
         Conexao conexao = new Conexao();
         JdbcTemplate con = conexao.getConexaoDoBanco();
 
-        con.update("INSERT INTO Computador (nome, sistemaOperacional, enderecoIP, numeroSerial, codigo, status, fkEmpresa) VALUES (?,?,?,?,?,?,?)",
-                novoComputador.getNome(), novoComputador.getSistemaOperacional(), novoComputador.getEnderecoIP(), novoComputador.getNumeroSerial(), novoComputador.getCodigo(), novoComputador.getStatus(), novoComputador.getFkEmpresa());
+        con.update("INSERT INTO Computador (nome, sistemaOperacional, numeroSerial, codigo, stts, fkEmpresa) VALUES (?,?,?,?,?,?)",
+                novoComputador.getNome(), novoComputador.getSistemaOperacional(), novoComputador.getNumeroSerial(), novoComputador.getCodigo(), novoComputador.getStatus(), novoComputador.getFkEmpresa());
     }
 
     public List<Computador> buscarTodosPeloIdEmpresa(Integer idEmpresa) {

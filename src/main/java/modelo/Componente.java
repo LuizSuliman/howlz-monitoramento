@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Componente {
+    private Integer idComponente;
     public enum Tipo {
         CPU,
         RAM,
@@ -15,11 +16,22 @@ public class Componente {
     private Integer fkComputador;
     private List<Monitoramento> monitoramentos;
 
+    public Componente() {
+    }
+
     public Componente(Tipo tipo, String modelo, Integer fkComputador) {
         this.tipo = tipo;
         this.modelo = modelo;
         this.fkComputador = fkComputador;
         this.monitoramentos = new ArrayList<>();
+    }
+
+    public Integer getIdComponente() {
+        return idComponente;
+    }
+
+    public void setIdComponente(Integer idComponente) {
+        this.idComponente = idComponente;
     }
 
     public String getTipo() {

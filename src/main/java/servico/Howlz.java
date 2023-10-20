@@ -5,17 +5,22 @@ import com.github.britooo.looca.api.group.discos.Disco;
 import com.github.britooo.looca.api.group.discos.DiscoGrupo;
 import dao.ComponenteDao;
 import dao.ComputadorDao;
+import dao.MonitoramentoDao;
 import dao.UsuarioDao;
 import modelo.Componente;
 import modelo.Computador;
+import modelo.Monitoramento;
 import oshi.SystemInfo;
 import oshi.hardware.GraphicsCard;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Howlz {
     UsuarioDao usuarioDao = new UsuarioDao();
     ComputadorDao computadorDao = new ComputadorDao();
     ComponenteDao componenteDao = new ComponenteDao();
+    MonitoramentoDao monitoramentoDao= new MonitoramentoDao();
     Looca looca = new Looca();
     SystemInfo si = new SystemInfo();
     public Boolean validarLogin(String email, String senha) {
@@ -68,8 +73,57 @@ public class Howlz {
         System.out.println(computador.getComponentes());
     }
 
-    public void monitorarComponentes() {
+    public void monitorar(Componente componente) {
+        // CPU
+        switch (componente.getTipo()) {
+            case "CPU":
+                Monitoramento usoCpu = new Monitoramento();
+                usoCpu.setTipo("PORCENTAGEMUSO");
+                usoCpu.setDataHora(LocalDateTime.now());
+                usoCpu.setFkComponente(componente.getIdComponente());
+                usoCpu.setValor(looca.getProcessador().getUso());
+                monitoramentoDao.salvar(usoCpu);
+                System.out.println(usoCpu);
+                break;
+            case "RAM":
+                Monitoramento usoRam = new Monitoramento();
+                usoRam.setTipo("GBUSO");
+                usoRam.setDataHora(LocalDateTime.now());
+                usoRam.setFkComponente(componente.getIdComponente());
+                usoRam.setValor(looca.getMemoria().getEmUso().doubleValue());
+                monitoramentoDao.salvar(usoRam);
+                System.out.println(usoRam);
+                break;
+            case "DISCO":
+                Monitoramento usoDisco = new Monitoramento();
+                usoDisco.setTipo("GBDISPONIVEL");
+                usoDisco.setDataHora(LocalDateTime.now());
+                usoDisco.setFkComponente(componente.getIdComponente());
+                List<Disco> discos = looca.getGrupoDeDiscos().getDiscos();
+                Disco discoCerto = discos.get(0);
+                for (Disco discoAtual : discos) {
+                    if (discoAtual.getSerial().equals(componenteDao.buscarSerialDiscoPeloId(componente.getIdComponente()))) {
+                        discoCerto = discoAtual;
+                    }
+                }
+                usoDisco.setValor(discoCerto.getTamanho().doubleValue());
+                monitoramentoDao.salvar(usoDisco);
+                System.out.println(usoDisco);
+                break;
+            default:
+                System.out.println("Tipo inválido");
+        }
 
+    }
+    public void monitorarRam(Integer fkComponente) {
+        // CPU
+        Monitoramento monitoramento = new Monitoramento(looca.getProcessador().getUso(), fkComponente);
+        monitoramentoDao.salvar(monitoramento);
+    }
+    public void monitorarDisco(Integer fkComponente) {
+        // CPU
+        Monitoramento monitoramento = new Monitoramento(looca.getProcessador().getUso(), fkComponente);
+        monitoramentoDao.salvar(monitoramento);
     }
 
 }

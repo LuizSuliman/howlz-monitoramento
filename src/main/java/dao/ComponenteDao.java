@@ -28,4 +28,11 @@ public class ComponenteDao {
 
         return con.query("SELECT * FROM Componente WHERE tipo = ? AND fkComputador = ?", new BeanPropertyRowMapper<>(Componente.class), nomeTipo, idComputador);
     }
+
+    public Componente buscarSerialDiscoPeloId(Integer id) {
+        Conexao conexao = new Conexao();
+        JdbcTemplate con = conexao.getConexaoDoBanco();
+
+        return con.queryForObject("SELECT serial FROM Componente WHERE tipo = 'DISCO' AND idComponente = ?", (Componente.class), id);
+    }
 }
