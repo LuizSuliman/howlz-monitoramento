@@ -3,10 +3,9 @@ package servico;
 import com.github.britooo.looca.api.core.Looca;
 import com.github.britooo.looca.api.group.discos.Disco;
 import com.github.britooo.looca.api.group.discos.DiscoGrupo;
-import dao.ComponenteDao;
-import dao.ComputadorDao;
-import dao.MonitoramentoDao;
-import dao.UsuarioDao;
+import com.github.britooo.looca.api.group.janelas.Janela;
+import com.github.britooo.looca.api.group.processos.Processo;
+import dao.*;
 import modelo.Componente;
 import modelo.Computador;
 import modelo.Monitoramento;
@@ -15,12 +14,15 @@ import oshi.hardware.GraphicsCard;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.github.britooo.looca.api.util.Conversor;
 
 public class Howlz {
     UsuarioDao usuarioDao = new UsuarioDao();
     ComputadorDao computadorDao = new ComputadorDao();
     ComponenteDao componenteDao = new ComponenteDao();
     MonitoramentoDao monitoramentoDao= new MonitoramentoDao();
+    ProcessoDao processoDao = new ProcessoDao();
+    JanelaDao janelaDao = new JanelaDao();
     Looca looca = new Looca();
     SystemInfo si = new SystemInfo();
     public Boolean validarLogin(String email, String senha) {
@@ -43,7 +45,7 @@ public class Howlz {
 
     public void cadastrarNovoComputador(String nome, String codigo) {
         Computador computador = new Computador(
-                nome, looca.getSistema().getSistemaOperacional(), si.getHardware().getComputerSystem().getSerialNumber(), codigo, Computador.Status.LIGADO, 1
+                nome, looca.getSistema().getSistemaOperacional(), si.getHardware().getComputerSystem().getSerialNumber(), codigo, "Ligado", 1
         );
         computadorDao.salvar(computador);
     }
@@ -51,29 +53,29 @@ public class Howlz {
     public void cadastrarNovosComponentes(String numeroSerial) {
         SystemInfo si = new SystemInfo();
         Computador computador = computadorDao.buscarPeloSerial(numeroSerial);
-        Componente cpu = new Componente(Componente.Tipo.CPU, looca.getProcessador().getNome(), computador.getIdComputador());
+        Componente cpu = new Componente("CPU", looca.getProcessador().getNome(), computador.getIdComputador());
         computador.adicionarComponente(cpu);
         componenteDao.salvar(cpu);
-        Componente ram = new Componente(Componente.Tipo.RAM, "Não especificado", computador.getIdComputador());
+        Componente ram = new Componente("RAM", "Não especificado", computador.getIdComputador());
         computador.adicionarComponente(ram);
         componenteDao.salvar(ram);
         DiscoGrupo discoGrupo = looca.getGrupoDeDiscos();
         List<Disco> discos = discoGrupo.getDiscos();
         for (Disco discoAtual : discos) {
-            Componente disco = new Componente(Componente.Tipo.DISCO, discoAtual.getModelo(), computador.getIdComputador(), discoAtual.getSerial());
+            Componente disco = new Componente("Disco", discoAtual.getModelo(), computador.getIdComputador(), discoAtual.getSerial());
             computador.adicionarComponente(disco);
             componenteDao.salvar(disco);
         }
         List<GraphicsCard> placasDeVideo = si.getHardware().getGraphicsCards();
         for (GraphicsCard gpuDaVez : placasDeVideo) {
-            Componente gpu = new Componente(Componente.Tipo.GPU, gpuDaVez.getName(), computador.getIdComputador());
+            Componente gpu = new Componente("GPU", gpuDaVez.getName(), computador.getIdComputador());
             computador.adicionarComponente(gpu);
             componenteDao.salvar(gpu);
         }
         System.out.println(computador.getComponentes());
     }
 
-    public void monitorar(Componente componente) {
+    public void monitorarComponentes(Componente componente) {
         // CPU
         switch (componente.getTipo()) {
             case "CPU":
@@ -94,7 +96,7 @@ public class Howlz {
                 monitoramentoDao.salvar(usoRam);
                 System.out.println(usoRam);
                 break;
-            case "DISCO":
+            case "Disco":
                 Monitoramento usoDisco = new Monitoramento();
                 usoDisco.setTipo("GBDISPONIVEL");
                 usoDisco.setDataHora(LocalDateTime.now());
@@ -116,15 +118,28 @@ public class Howlz {
         }
 
     }
-    public void monitorarRam(Integer fkComponente) {
-        // CPU
-        Monitoramento monitoramento = new Monitoramento(looca.getProcessador().getUso(), fkComponente);
-        monitoramentoDao.salvar(monitoramento);
+
+    public void monitorarProcessos(Processo processoLooca, Integer idComputador) {
+        modelo.Processo processo = new modelo.Processo(processoLooca.getPid(), processoLooca.getNome(), processoLooca.getUsoCpu(), processoLooca.getUsoMemoria(), Conversor.formatarBytes(processoLooca.getBytesUtilizados()), Conversor.formatarBytes(processoLooca.getMemoriaVirtualUtilizada()), idComputador, LocalDateTime.now());
+        processoDao.salvar(processo);
     }
-    public void monitorarDisco(Integer fkComponente) {
-        // CPU
-        Monitoramento monitoramento = new Monitoramento(looca.getProcessador().getUso(), fkComponente);
-        monitoramentoDao.salvar(monitoramento);
+
+    public void monitorarJanelas(Janela janelaLooca, Integer idComputador, Boolean estadoCritico) {
+        Integer visibilidade = (janelaLooca.isVisivel()) ?  1 : 0;
+        modelo.Janela janela = new modelo.Janela(janelaLooca.getPid().intValue(), janelaLooca.getJanelaId().intValue(), janelaLooca.getComando(), janelaLooca.getTitulo(), janelaLooca.getLocalizacaoETamanho().toString(), visibilidade, idComputador, LocalDateTime.now());
+        if (estadoCritico) {
+            modelo.Processo processoRelacionado = processoDao.buscarPeloPid(janelaLooca.getPid().intValue());
+            janela.setFkProcesso(processoRelacionado.getIdProcesso());
+        }
+        janelaDao.salvar(janela);
+    }
+
+    public Boolean estadoCritico() {
+        if (looca.getProcessador().getUso() > 90 || looca.getMemoria().getEmUso() > (looca.getMemoria().getTotal() - (looca.getMemoria().getTotal() / 5))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

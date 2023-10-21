@@ -1,4 +1,6 @@
 import com.github.britooo.looca.api.core.Looca;
+import com.github.britooo.looca.api.group.janelas.Janela;
+import com.github.britooo.looca.api.group.processos.Processo;
 import dao.ComponenteDao;
 import dao.ComputadorDao;
 import dao.UsuarioDao;
@@ -10,6 +12,7 @@ import servico.Howlz;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.Timer;
 import java.util.TimerTask;
 
 public class Teste {
@@ -57,8 +60,33 @@ public class Teste {
 
         Computador computador = computadorDao.buscarPeloSerial(si.getHardware().getComputerSystem().getSerialNumber());
         List<Componente> componentes = componenteDao.buscarTodosPeloIdComputador(computador.getIdComputador());
-        for (Componente componente : componentes) {
-            howlz.monitorar(componente);
-        }
+
+        // Agendamendo tarefa de monitoramento:
+        Timer timer = new Timer();
+        int delay = 0; // Atraso inicial
+        int intervalo = 15000; // Intervalo de tempo em milissegundos
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                for (Componente componente : componentes) {
+                    howlz.monitorarComponentes(componente);
+                }
+
+                if (howlz.estadoCritico()) {
+                    List<Processo> processos = looca.getGrupoDeProcessos().getProcessos();
+                    for (Processo processo : processos) {
+                        howlz.monitorarProcessos(processo, computador.getIdComputador());
+                    }
+                }
+
+                List<Janela> janelas = looca.getGrupoDeJanelas().getJanelasVisiveis();
+                for (Janela janela : janelas) {
+                    howlz.monitorarJanelas(janela, computador.getIdComputador(), howlz.estadoCritico());
+                }
+
+                System.out.println("Fim do Timer");
+            }
+        }, delay, intervalo);
     }
 }

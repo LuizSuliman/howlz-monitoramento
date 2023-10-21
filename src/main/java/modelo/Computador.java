@@ -5,24 +5,20 @@ import java.util.List;
 
 public class Computador {
     private Integer idComputador;
-    public enum Status {
-        LIGADO,
-        DESLIGADO,
-        MANUTENCAO
-    }
+    private String tipo;
     private String nome;
     private String sistemaOperacional;
     private String enderecoIP;
     private String numeroSerial;
     private String codigo;
-    private Status status;
+    private String status;
     private Integer fkEmpresa;
     private List<Componente> componentes;
 
     public Computador() {
         this.componentes = new ArrayList<>();
     }
-    public Computador(String nome, String sistemaOperacional, String numeroSerial, String codigo, Status status, Integer fkEmpresa) {
+    public Computador(String nome, String sistemaOperacional, String numeroSerial, String codigo, String status, Integer fkEmpresa) {
         this.nome = nome;
         this.sistemaOperacional = sistemaOperacional;
         // this.enderecoIP = enderecoIP;
@@ -86,10 +82,10 @@ public class Computador {
     }
 
     public String getStatus() {
-        return status.name();
+        return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

@@ -5,29 +5,23 @@ import java.util.List;
 
 public class Componente {
     private Integer idComponente;
-    public enum Tipo {
-        CPU,
-        RAM,
-        DISCO,
-        GPU
-    }
-    private Tipo tipo;
+    private String tipo;
     private String modelo;
+    private String numeroSerial;
     private Integer fkComputador;
     private List<Monitoramento> monitoramentos;
-    private String numeroSerial = null;
 
     public Componente() {
     }
 
-    public Componente(Tipo tipo, String modelo, Integer fkComputador) {
+    public Componente(String tipo, String modelo, Integer fkComputador) {
         this.tipo = tipo;
         this.modelo = modelo;
         this.fkComputador = fkComputador;
         this.monitoramentos = new ArrayList<>();
     }
 
-    public Componente(Tipo tipo, String modelo, Integer fkComputador, String serial) {
+    public Componente(String tipo, String modelo, Integer fkComputador, String serial) {
         this.tipo = tipo;
         this.modelo = modelo;
         this.fkComputador = fkComputador;
@@ -43,10 +37,10 @@ public class Componente {
     }
 
     public String getTipo() {
-        return tipo.name();
+        return tipo;
     }
 
-    public void setTipo(Tipo tipo) {
+    public void setTipo(String tipo) {
         this.tipo = tipo;
     }
 
