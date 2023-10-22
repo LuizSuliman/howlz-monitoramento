@@ -92,13 +92,13 @@ public class Howlz {
                 usoRam.setTipo("GBUSO");
                 usoRam.setDataHora(LocalDateTime.now());
                 usoRam.setFkComponente(componente.getIdComponente());
-                usoRam.setValor(looca.getMemoria().getEmUso().doubleValue());
+                usoRam.setValor(looca.getMemoria().getEmUso().doubleValue() / (1024 * 1024 * 1024));
                 monitoramentoDao.salvar(usoRam);
                 System.out.println(usoRam);
                 break;
             case "Disco":
                 Monitoramento usoDisco = new Monitoramento();
-                usoDisco.setTipo("GBDISPONIVEL");
+                usoDisco.setTipo("GBTOTAL");
                 usoDisco.setDataHora(LocalDateTime.now());
                 usoDisco.setFkComponente(componente.getIdComponente());
                 List<Disco> discos = looca.getGrupoDeDiscos().getDiscos();
@@ -108,7 +108,7 @@ public class Howlz {
                         discoCerto = discoAtual;
                     }
                 }
-                usoDisco.setValor(discoCerto.getTamanho().doubleValue());
+                usoDisco.setValor(discoCerto.getTamanho().doubleValue() / (1024 * 1024 * 1024));
                 monitoramentoDao.salvar(usoDisco);
                 System.out.println(usoDisco);
                 break;
@@ -135,7 +135,7 @@ public class Howlz {
     }
 
     public Boolean estadoCritico() {
-        if (looca.getProcessador().getUso() > 90 || looca.getMemoria().getEmUso() > (looca.getMemoria().getTotal() - (looca.getMemoria().getTotal() / 5))) {
+        if (looca.getProcessador().getUso() > 90 || looca.getMemoria().getEmUso() > (looca.getMemoria().getTotal() - (looca.getMemoria().getTotal() / 10))) {
             return true;
         } else {
             return false;

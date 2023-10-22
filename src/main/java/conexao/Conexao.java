@@ -21,7 +21,7 @@ public class Conexao {
                 jdbc:mysql://localhost:3306/mydb <- EXEMPLO PARA MYSQL
                 jdbc:sqlserver://localhost:1433;database=mydb <- EXEMPLO PARA SQL SERVER
         */
-        dataSource.setUrl("jdbc:mysql://localhost:3306/holwz");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/howlz");
         // ALTERAR VALORES ABAIXO PARA SUAS CREDENCIAIS DO MYSQL
         dataSource.setUsername("root");
         dataSource.setPassword("luizbd");

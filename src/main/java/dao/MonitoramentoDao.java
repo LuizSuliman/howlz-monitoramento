@@ -5,6 +5,8 @@ import modelo.Monitoramento;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class MonitoramentoDao {
@@ -12,7 +14,7 @@ public class MonitoramentoDao {
         Conexao conexao = new Conexao();
         JdbcTemplate con = conexao.getConexaoDoBanco();
 
-        con.update("INSERT INTO Monitoramento (dataHora, valor, tipo, fkComponente) VALUES (?,?,?,?)", novoMonitoramento.getDataHora(), novoMonitoramento.getValor(), novoMonitoramento.getTipo(), novoMonitoramento.getFkComponente());
+        con.update("INSERT INTO Monitoramento (dataHora, valor, tipo, fkComponente) VALUES (?,?,?,?)", novoMonitoramento.getDataHora(), BigDecimal.valueOf(novoMonitoramento.getValor()).setScale(2, RoundingMode.HALF_UP), novoMonitoramento.getTipo(), novoMonitoramento.getFkComponente());
     }
 
     public List<Monitoramento> buscarTodosPeloIdComponente(Integer idComponente) {
