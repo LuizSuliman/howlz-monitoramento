@@ -73,7 +73,8 @@ public class Teste {
                     howlz.monitorarComponentes(componente);
                 }
 
-                if (howlz.estadoCritico()) {
+                Boolean estadoCritico = howlz.estadoCritico();
+                if (estadoCritico) {
                     List<Processo> processos = looca.getGrupoDeProcessos().getProcessos();
                     for (Processo processo : processos) {
                         howlz.monitorarProcessos(processo, computador.getIdComputador());
@@ -82,7 +83,7 @@ public class Teste {
 
                 List<Janela> janelas = looca.getGrupoDeJanelas().getJanelasVisiveis();
                 for (Janela janela : janelas) {
-                    howlz.monitorarJanelas(janela, computador.getIdComputador(), howlz.estadoCritico());
+                    howlz.monitorarJanelas(janela, computador.getIdComputador(), estadoCritico);
                 }
 
                 System.out.println("Fim do Timer");

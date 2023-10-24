@@ -14,6 +14,7 @@ import oshi.SystemInfo;
 import oshi.hardware.GraphicsCard;
 
 import java.awt.*;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -153,7 +154,8 @@ public class HowlzLuiz {
 
     // Instânciando SystemTray do Computador, para adicionar a aplicação à Barra de Tarefas:
     SystemTray systemTray = SystemTray.getSystemTray();
-    Image imagem = Toolkit.getDefaultToolkit().createImage("owlHowlz.png");
+    URL url = HowlzLuiz.class.getResource("/owlHowlz.png");
+    Image imagem = Toolkit.getDefaultToolkit().getImage(url);
 
     TrayIcon trayIcon;
     public void exibirNaBandeja() throws AWTException {
@@ -161,7 +163,7 @@ public class HowlzLuiz {
         trayIcon.setImageAutoSize(true);
         systemTray.add(trayIcon);
         // Adicionando aplicação à barra de tarefas:
-        trayIcon.displayMessage("Howlz Monitoramento", "Monitoramento Iniciado!", TrayIcon.MessageType.INFO);
+        trayIcon.displayMessage("Howlz Monitoramento", "Monitoramento Iniciado!", TrayIcon.MessageType.NONE);
     }
 
     public void emitirNotificacao(List<String> alertas) throws AWTException {
