@@ -3,10 +3,10 @@ package conexao;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class Conexao {
+public class ConexaoMySQL {
     private JdbcTemplate conexaoDoBanco;
 
-    public Conexao() {
+    public ConexaoMySQL() {
         BasicDataSource dataSource = new BasicDataSource();
         /*
             Exemplo de driverClassName:

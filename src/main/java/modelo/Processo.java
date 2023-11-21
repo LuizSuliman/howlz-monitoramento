@@ -6,24 +6,15 @@ public class Processo {
     private Integer idProcesso;
     private Integer pid;
     private String nome;
-    private Double usoCpu;
-    private Double usoRam;
-    private String bytesUtilizados;
-    private String memoriaVirtual;
     private Integer fkComputador;
-
     private LocalDateTime dataHora;
 
     public Processo() {
     }
 
-    public Processo(Integer pid, String nome, Double usoCpu, Double usoRam, String bytesUtilizados, String memoriaVirtual, Integer fkComputador, LocalDateTime dataHora) {
+    public Processo(Integer pid, String nome, Integer fkComputador, LocalDateTime dataHora) {
         this.pid = pid;
         this.nome = nome;
-        this.usoCpu = usoCpu;
-        this.usoRam = usoRam;
-        this.bytesUtilizados = bytesUtilizados;
-        this.memoriaVirtual = memoriaVirtual;
         this.fkComputador = fkComputador;
         this.dataHora = dataHora;
     }
@@ -52,38 +43,6 @@ public class Processo {
         this.nome = nome;
     }
 
-    public Double getUsoCpu() {
-        return usoCpu;
-    }
-
-    public void setUsoCpu(Double usoCpu) {
-        this.usoCpu = usoCpu;
-    }
-
-    public Double getUsoRam() {
-        return usoRam;
-    }
-
-    public void setUsoRam(Double usoRam) {
-        this.usoRam = usoRam;
-    }
-
-    public String getBytesUtilizados() {
-        return bytesUtilizados;
-    }
-
-    public void setBytesUtilizados(String bytesUtilizados) {
-        this.bytesUtilizados = bytesUtilizados;
-    }
-
-    public String getMemoriaVirtual() {
-        return memoriaVirtual;
-    }
-
-    public void setMemoriaVirtual(String memoriaVirtual) {
-        this.memoriaVirtual = memoriaVirtual;
-    }
-
     public Integer getFkComputador() {
         return fkComputador;
     }
@@ -102,16 +61,12 @@ public class Processo {
 
     @Override
     public String toString() {
-        return "Processo{" +
-                "idProcesso=" + idProcesso +
-                ", pid=" + pid +
-                ", nome='" + nome + '\'' +
-                ", usoCpu=" + usoCpu +
-                ", usoRam=" + usoRam +
-                ", bytesUtilizados='" + bytesUtilizados + '\'' +
-                ", memoriaVirtual='" + memoriaVirtual + '\'' +
-                ", fkComputador=" + fkComputador +
-                ", dataHora=" + dataHora +
-                '}';
+        return """
+                ID: %d
+                PID: %d
+                Nome: %s
+                Computador (FK):
+                Data e Hora: %s
+                """.formatted(idProcesso, pid, nome, fkComputador, dataHora);
     }
 }

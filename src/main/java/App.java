@@ -8,18 +8,15 @@ import modelo.Componente;
 import modelo.Computador;
 import modelo.Usuario;
 import oshi.SystemInfo;
-import servico.HowlzLuiz;
+import servico.Howlz;
 
-import java.awt.*;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.IOException;
+import java.util.*;
 
-public class TesteLuiz {
+public class App {
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
-        HowlzLuiz howlz = new HowlzLuiz();
+        Howlz howlz = new Howlz();
         Looca looca = new Looca();
         SystemInfo si = new SystemInfo();
         UsuarioDao usuarioDao = new UsuarioDao();
@@ -30,6 +27,7 @@ public class TesteLuiz {
         Boolean cadastroValidado = false;
         Usuario usuarioLogado = null;
 
+        // Login
         do {
             System.out.println("Digite seu email:");
             String email = in.next();
@@ -50,22 +48,21 @@ public class TesteLuiz {
                     System.exit(0);
                 }
             }
-        } while(!cadastroValidado);
+        } while (!cadastroValidado);
 
-        if (howlz.computadorNaoCadastrado(si.getHardware().getComputerSystem().getSerialNumber())) {
-            System.out.println("Este computador ainda não está na nossa base de dados.\nQual o código que sua empresa usa para identificá-lo?");
+        // Obtendo/Atualizando informações para o banco local:
+        howlz.atualizarEmpresaDoUsuarioLocal(usuarioLogado.getFkEmpresa());
+        howlz.atualizarUsuarioLocal(usuarioLogado);
+
+        // Cadastro de novos computadores:
+        if (howlz.computadorNaoCadastrado(looca.getProcessador().getId())) {
+            System.out.println("Este computador ainda não está na nossa base de dados.\nQual o código de patrimônio que sua empresa usa para identificá-lo?");
             String codigo = in.next();
-            howlz.cadastrarNovoComputador(usuarioLogado.getNome(), codigo);
-            howlz.cadastrarNovosComponentes(si.getHardware().getComputerSystem().getSerialNumber());
+            howlz.cadastrarNovoComputador(codigo, usuarioLogado.getFkEmpresa());
+            howlz.cadastrarNovosComponentes(looca.getProcessador().getId());
         }
 
-        try {
-            howlz.exibirNaBandeja();
-        } catch (AWTException e) {
-            System.out.println("Monitoramento iniciado!");
-        }
-
-        Computador computador = computadorDao.buscarPeloSerial(si.getHardware().getComputerSystem().getSerialNumber());
+        Computador computador = computadorDao.buscarPeloSerial(looca.getProcessador().getId());
         List<Componente> componentes = componenteDao.buscarTodosPeloIdComputador(computador.getIdComputador());
 
         // Agendamendo tarefa de monitoramento:
@@ -76,31 +73,28 @@ public class TesteLuiz {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                List<String> statusComponentes = new ArrayList<>();
                 for (Componente componente : componentes) {
-                    howlz.monitorarComponentes(componente);
+                    try {
+                        statusComponentes.add(howlz.monitorarComponentes(componente, computador));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
-                List<String> alertas = howlz.estadoCritico();
-                if (!alertas.isEmpty()) {
+                String estadoCritico = howlz.verificarEstadoCritico();
+                if (estadoCritico) {
                     List<Processo> processos = looca.getGrupoDeProcessos().getProcessos();
                     for (Processo processo : processos) {
                         howlz.monitorarProcessos(processo, computador.getIdComputador());
                     }
+                } else if () {
 
-                    if (SystemTray.isSupported()) {
-                        try {
-                            howlz.emitirNotificacao(alertas);
-                        } catch (AWTException e) {
-                            System.out.println("Não foi possível criar a notificação: " + e);
-                        }
-                    } else {
-                        System.out.println("Este dispositivo não tem suporte à tecnologia 'SystemTray'!");
-                    }
                 }
 
                 List<Janela> janelas = looca.getGrupoDeJanelas().getJanelasVisiveis();
                 for (Janela janela : janelas) {
-                    howlz.monitorarJanelas(janela, computador.getIdComputador(), !alertas.isEmpty());
+                    howlz.monitorarJanelas(janela, computador.getIdComputador(), estadoCritico);
                 }
 
                 System.out.println("Fim do Timer");

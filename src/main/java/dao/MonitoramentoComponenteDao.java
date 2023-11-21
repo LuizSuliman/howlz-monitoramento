@@ -2,26 +2,28 @@ package dao;
 
 import conexao.ConexaoMySQL;
 import conexao.ConexaoSQLServer;
-import modelo.Janela;
+import modelo.MonitoramentoComponente;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.SQLException;
 
-public class JanelaDao {
-    public void salvar(Janela janela) {
+public class MonitoramentoComponenteDao {
+    public void salvar(MonitoramentoComponente novoMonitoramento) {
         ConexaoMySQL conexao = new ConexaoMySQL();
         JdbcTemplate con = conexao.getConexaoDoBanco();
         ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        String sql = "INSERT INTO Janela (pid, idLocalJanela, comando, titulo, posicao, visibilidade, fkComputador, fkProcesso, dataHora) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO MonitoramentoComponente (dataHora, valor, fkTipoMonitoramentoComponente, fkComponente) VALUES (?, ?, ?, ?)";
 
         try {
             // Salvando no banco local
-            con.update(sql, janela.getPid(), janela.getIdLocalJanela(), janela.getComando(), janela.getTitulo(), janela.getPosicao(), janela.getVisibilidade(), janela.getFkComputador(), janela.getFkProcesso(), janela.getDataHora());
+            con.update(sql, novoMonitoramento.getDataHora(), novoMonitoramento.getValor(), novoMonitoramento.getFkTipoMonitoramentoComponente(), novoMonitoramento.getFkComponente());
 
             // Salvando no banco do servidor
-            conServer.update(sql, janela.getPid(), janela.getIdLocalJanela(), janela.getComando(), janela.getTitulo(), janela.getPosicao(), janela.getVisibilidade(), janela.getFkComputador(), janela.getFkProcesso(), janela.getDataHora());
+            conServer.update(sql, novoMonitoramento.getDataHora(), novoMonitoramento.getValor(), novoMonitoramento.getFkTipoMonitoramentoComponente(), novoMonitoramento.getFkComponente());
 
         } catch (Exception e) {
             // Trate exceções (log, relatório de erro, etc.)

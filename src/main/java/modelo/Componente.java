@@ -5,26 +5,20 @@ import java.util.List;
 
 public class Componente {
     private Integer idComponente;
-    private String tipo;
     private String modelo;
-    private String numeroSerial;
+    private String identificador;
     private Integer fkComputador;
+    private Integer fkTipoComponente;
     private List<Monitoramento> monitoramentos;
 
     public Componente() {
     }
 
-    public Componente(String tipo, String modelo, Integer fkComputador) {
-        this.tipo = tipo;
+    public Componente(String modelo, String identificador, Integer fkComputador, Integer fkTipoComponente) {
         this.modelo = modelo;
+        this.identificador = identificador;
         this.fkComputador = fkComputador;
-        this.monitoramentos = new ArrayList<>();
-    }
-
-    public Componente(String tipo, String modelo, Integer fkComputador, String serial) {
-        this.tipo = tipo;
-        this.modelo = modelo;
-        this.fkComputador = fkComputador;
+        this.fkTipoComponente = fkTipoComponente;
         this.monitoramentos = new ArrayList<>();
     }
 
@@ -34,14 +28,6 @@ public class Componente {
 
     public void setIdComponente(Integer idComponente) {
         this.idComponente = idComponente;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
     }
 
     public String getModelo() {
@@ -68,21 +54,29 @@ public class Componente {
         this.monitoramentos = monitoramentos;
     }
 
-    public String getNumeroSerial() {
-        return numeroSerial;
+    public String getIdentificador() {
+        return identificador;
     }
 
-    public void setNumeroSerial(String numeroSerial) {
-        this.numeroSerial = numeroSerial;
+    public void setIdentificador(String identificador) {
+        this.identificador = identificador;
+    }
+
+    public Integer getFkTipoComponente() {
+        return fkTipoComponente;
+    }
+
+    public void setFkTipoComponente(Integer fkTipoComponente) {
+        this.fkTipoComponente = fkTipoComponente;
     }
 
     @Override
     public String toString() {
-        return "Componente{" +
-                "tipo=" + tipo +
-                ", modelo='" + modelo + '\'' +
-                ", fkComputador=" + fkComputador +
-                ", monitoramentos=" + monitoramentos +
-                '}';
+        return """
+                ID: %d
+                Modelo: %s
+                Identificador: %s
+                Computador (FK): %d
+                Tipo de Componente: %d""".formatted(idComponente, modelo, identificador, fkComputador, fkTipoComponente);
     }
 }

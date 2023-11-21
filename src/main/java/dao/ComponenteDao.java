@@ -1,38 +1,178 @@
 package dao;
 
-import conexao.Conexao;
+import conexao.ConexaoMySQL;
+import conexao.ConexaoSQLServer;
 import modelo.Componente;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class ComponenteDao {
     public void salvar(Componente novoComponente) {
-        Conexao conexao = new Conexao();
+        ConexaoMySQL conexao = new ConexaoMySQL();
         JdbcTemplate con = conexao.getConexaoDoBanco();
+        ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
+        JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        con.update("INSERT INTO Componente (tipo, modelo, fkComputador, numeroSerial) VALUES (?,?,?,?)", novoComponente.getTipo(), novoComponente.getModelo(), novoComponente.getFkComputador(), novoComponente.getNumeroSerial());
+        String sql = "INSERT INTO Componente (modelo, identificador, fkComputador, fkTipoComponente) VALUES (?, ?, ?, ?)";
+
+        try {
+            // Salvando no banco local
+            con.update(sql, novoComponente.getModelo(), novoComponente.getIdentificador(), novoComponente.getFkComputador(), novoComponente.getFkTipoComponente());
+
+            // Salvando no banco do servidor
+            conServer.update(sql, novoComponente.getModelo(), novoComponente.getIdentificador(), novoComponente.getFkComputador(), novoComponente.getFkTipoComponente());
+
+        } catch (Exception e) {
+            // Trate exceções (log, relatório de erro, etc.)
+            e.printStackTrace();
+
+        } finally {
+            // Certifique-se de fechar as conexões, mesmo se ocorrer uma exceção
+            if (con != null) {
+                try {
+                    con.getDataSource().getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Trate a exceção de fechamento da conexão local
+                }
+            }
+
+            if (conServer != null) {
+                try {
+                    conServer.getDataSource().getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Trate a exceção de fechamento da conexão do servidor
+                }
+            }
+        }
     }
 
     public List<Componente> buscarTodosPeloIdComputador(Integer idComputador) {
-        Conexao conexao = new Conexao();
+        ConexaoMySQL conexao = new ConexaoMySQL();
         JdbcTemplate con = conexao.getConexaoDoBanco();
+        ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
+        JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        return con.query("SELECT * FROM Componente WHERE fkComputador = ?", new BeanPropertyRowMapper<>(Componente.class), idComputador);
+        String sql = "SELECT * FROM Componente WHERE fkComputador = ?";
+
+        try {
+            // Buscando no banco local
+            List<Componente> componentesLocal = con.query(sql, new BeanPropertyRowMapper<>(Componente.class), idComputador);
+
+            // Buscando no banco do servidor
+            List<Componente> componentesServer = conServer.query(sql, new BeanPropertyRowMapper<>(Componente.class), idComputador);
+
+            return (componentesLocal != null) ? componentesLocal : componentesServer;
+
+        } catch (Exception e) {
+            // Trate exceções (log, relatório de erro, etc.)
+            e.printStackTrace();
+            return null;
+
+        } finally {
+            // Certifique-se de fechar as conexões, mesmo se ocorrer uma exceção
+            if (con != null) {
+                try {
+                    con.getDataSource().getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Trate a exceção de fechamento da conexão local
+                }
+            }
+
+            if (conServer != null) {
+                try {
+                    conServer.getDataSource().getConnection().close();
+                }catch (SQLException e) {
+                    e.printStackTrace(); // Trate a exceção de fechamento da conexão do servidor
+                }
+            }
+        }
     }
 
     public List<Componente> buscarPeloTipoEIdComputador(String nomeTipo, Integer idComputador) {
-        Conexao conexao = new Conexao();
+        ConexaoMySQL conexao = new ConexaoMySQL();
         JdbcTemplate con = conexao.getConexaoDoBanco();
+        ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
+        JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        return con.query("SELECT * FROM Componente WHERE tipo = ? AND fkComputador = ?", new BeanPropertyRowMapper<>(Componente.class), nomeTipo, idComputador);
+        String sql = "SELECT * FROM Componente WHERE tipo = ? AND fkComputador = ?";
+
+        try {
+            // Buscando no banco local
+            List<Componente> componentesLocal = con.query(sql, new BeanPropertyRowMapper<>(Componente.class), nomeTipo, idComputador);
+
+            // Buscando no banco do servidor
+            List<Componente> componentesServer = conServer.query(sql, new BeanPropertyRowMapper<>(Componente.class), nomeTipo, idComputador);
+
+            return (componentesLocal != null) ? componentesLocal : componentesServer;
+
+        } catch (Exception e) {
+            // Trate exceções (log, relatório de erro, etc.)
+            e.printStackTrace();
+            return null;
+
+        } finally {
+            // Certifique-se de fechar as conexões, mesmo se ocorrer uma exceção
+            if (con != null) {
+                try {
+                    con.getDataSource().getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Trate a exceção de fechamento da conexão local
+                }
+            }
+
+            if (conServer != null) {
+                try {
+                    conServer.getDataSource().getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Trate a exceção de fechamento da conexão do servidor
+                }
+            }
+        }
     }
 
     public Componente buscarSerialDiscoPeloId(Integer id) {
-        Conexao conexao = new Conexao();
+        ConexaoMySQL conexao = new ConexaoMySQL();
         JdbcTemplate con = conexao.getConexaoDoBanco();
+        ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
+        JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        return con.queryForObject("SELECT numeroSerial FROM Componente WHERE tipo = 'DISCO' AND idComponente = ?", (Componente.class), id);
+        String sql = "SELECT numeroSerial FROM Componente WHERE tipo = 'DISCO' AND idComponente = ?";
+
+        try {
+            // Buscando no banco local
+            Componente componenteLocal = con.queryForObject(sql, (Componente.class), id);
+
+            // Buscando no banco do servidor
+            Componente componenteServer = conServer.queryForObject(sql, (Componente.class), id);
+
+            // Escolha qual componente retornar (pode ser lógica de negócios específica)
+            return (componenteLocal != null) ? componenteLocal : componenteServer;
+
+        } catch (Exception e) {
+            // Trate exceções (log, relatório de erro, etc.)
+            e.printStackTrace();
+            return null;
+
+        } finally {
+            // Certifique-se de fechar as conexões, mesmo se ocorrer uma exceção
+            if (con != null) {
+                try {
+                    con.getDataSource().getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Trate a exceção de fechamento da conexão local
+                }
+            }
+
+            if (conServer != null) {
+                try {
+                    conServer.getDataSource().getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Trate a exceção de fechamento da conexão do servidor
+                }
+            }
+        }
     }
 }

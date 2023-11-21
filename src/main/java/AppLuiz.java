@@ -8,17 +8,18 @@ import modelo.Componente;
 import modelo.Computador;
 import modelo.Usuario;
 import oshi.SystemInfo;
-import servico.Howlz;
+import servico.HowlzLuiz;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Teste {
+public class AppLuiz {
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
-        Howlz howlz = new Howlz();
+        HowlzLuiz howlz = new HowlzLuiz();
         Looca looca = new Looca();
         SystemInfo si = new SystemInfo();
         UsuarioDao usuarioDao = new UsuarioDao();
@@ -58,6 +59,12 @@ public class Teste {
             howlz.cadastrarNovosComponentes(si.getHardware().getComputerSystem().getSerialNumber());
         }
 
+        try {
+            howlz.exibirNaBandeja();
+        } catch (AWTException e) {
+            System.out.println("Monitoramento iniciado!");
+        }
+
         Computador computador = computadorDao.buscarPeloSerial(si.getHardware().getComputerSystem().getSerialNumber());
         List<Componente> componentes = componenteDao.buscarTodosPeloIdComputador(computador.getIdComputador());
 
@@ -73,17 +80,27 @@ public class Teste {
                     howlz.monitorarComponentes(componente);
                 }
 
-                Boolean estadoCritico = howlz.estadoCritico();
-                if (estadoCritico) {
+                List<String> alertas = howlz.estadoCritico();
+                if (!alertas.isEmpty()) {
                     List<Processo> processos = looca.getGrupoDeProcessos().getProcessos();
                     for (Processo processo : processos) {
                         howlz.monitorarProcessos(processo, computador.getIdComputador());
+                    }
+
+                    if (SystemTray.isSupported()) {
+                        try {
+                            howlz.emitirNotificacao(alertas);
+                        } catch (AWTException e) {
+                            System.out.println("Não foi possível criar a notificação: " + e);
+                        }
+                    } else {
+                        System.out.println("Este dispositivo não tem suporte à tecnologia 'SystemTray'!");
                     }
                 }
 
                 List<Janela> janelas = looca.getGrupoDeJanelas().getJanelasVisiveis();
                 for (Janela janela : janelas) {
-                    howlz.monitorarJanelas(janela, computador.getIdComputador(), estadoCritico);
+                    howlz.monitorarJanelas(janela, computador.getIdComputador(), !alertas.isEmpty());
                 }
 
                 System.out.println("Fim do Timer");

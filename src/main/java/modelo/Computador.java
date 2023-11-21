@@ -5,26 +5,19 @@ import java.util.List;
 
 public class Computador {
     private Integer idComputador;
-    private String tipo;
-    private String nome;
+    private String codigoPatimonio;
     private String sistemaOperacional;
-    private String enderecoIP;
     private String numeroSerial;
-    private String codigo;
-    private String status;
     private Integer fkEmpresa;
     private List<Componente> componentes;
 
     public Computador() {
-        this.componentes = new ArrayList<>();
     }
-    public Computador(String nome, String sistemaOperacional, String numeroSerial, String codigo, String status, Integer fkEmpresa) {
-        this.nome = nome;
+
+    public Computador(String codigoPatimonio, String sistemaOperacional, String numeroSerial, Integer fkEmpresa) {
+        this.codigoPatimonio = codigoPatimonio;
         this.sistemaOperacional = sistemaOperacional;
-        // this.enderecoIP = enderecoIP;
         this.numeroSerial = numeroSerial;
-        this.codigo = codigo;
-        this.status = status;
         this.fkEmpresa = fkEmpresa;
         this.componentes = new ArrayList<>();
     }
@@ -41,12 +34,12 @@ public class Computador {
         this.idComputador = idComputador;
     }
 
-    public String getNome() {
-        return nome;
+    public String getCodigoPatimonio() {
+        return codigoPatimonio;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setCodigoPatimonio(String codigoPatimonio) {
+        this.codigoPatimonio = codigoPatimonio;
     }
 
     public String getSistemaOperacional() {
@@ -57,36 +50,12 @@ public class Computador {
         this.sistemaOperacional = sistemaOperacional;
     }
 
-    public String getEnderecoIP() {
-        return enderecoIP;
-    }
-
-    public void setEnderecoIP(String enderecoIP) {
-        this.enderecoIP = enderecoIP;
-    }
-
     public String getNumeroSerial() {
         return numeroSerial;
     }
 
     public void setNumeroSerial(String numeroSerial) {
         this.numeroSerial = numeroSerial;
-    }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public Integer getFkEmpresa() {
@@ -107,15 +76,11 @@ public class Computador {
 
     @Override
     public String toString() {
-        return "Computador{" +
-                "nome='" + nome + '\'' +
-                ", sistemaOperacional='" + sistemaOperacional + '\'' +
-                ", enderecoIP='" + enderecoIP + '\'' +
-                ", numeroSerial='" + numeroSerial + '\'' +
-                ", codigo='" + codigo + '\'' +
-                ", status=" + status +
-                ", fkEmpresa=" + fkEmpresa +
-                ", componentes=" + componentes +
-                '}';
+        return """
+                ID: %d
+                Código do Patrimônio: %s
+                Número Serial: %s
+                Sistema Operacional: %s
+                Empresa (FK): %d""".formatted(idComputador, codigoPatimonio, numeroSerial, sistemaOperacional, fkEmpresa, componentes);
     }
 }
