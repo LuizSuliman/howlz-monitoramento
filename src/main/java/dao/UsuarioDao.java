@@ -106,7 +106,7 @@ public class UsuarioDao {
         String sql = "INSERT INTO Usuario (idUsuario, nome, fkEmpresa, fkTipoUsuario) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE nome = ?, fkEmpresa = ?, fkTipoUsuario = ?";
 
         try {
-            con.update(sql, new BeanPropertyRowMapper<>(Computador.class), usuario.getIdUsuario(), usuario.getNome(),usuario.getFkEmpresa(), usuario.getFkTipoUsuario(), usuario.getNome(),usuario.getFkEmpresa(), usuario.getFkTipoUsuario());
+            con.update(sql, usuario.getIdUsuario(), usuario.getNome(),usuario.getFkEmpresa(), usuario.getFkTipoUsuario(), usuario.getNome(),usuario.getFkEmpresa(), usuario.getFkTipoUsuario());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

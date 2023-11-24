@@ -7,6 +7,9 @@ public class Empresa {
     private String apelido;
     private String cnpj;
 
+    public Empresa() {
+    }
+
     public Empresa(String razaoSocial, String nomeFantasia, String apelido, String cnpj) {
         this.razaoSocial = razaoSocial;
         this.nomeFantasia = nomeFantasia;

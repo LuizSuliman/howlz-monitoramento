@@ -139,7 +139,7 @@ public class ComputadorDao {
         ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        String sql = "SELECT * FROM Computador WHERE numeroSerial = ?";
+        String sql = "SELECT * FROM Computador WHERE numeroSerial = ? LIMIT 1";
 
         try {
             // Buscando no banco local

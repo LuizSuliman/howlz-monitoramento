@@ -6,8 +6,6 @@ import modelo.Processo;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.SQLException;
 
 public class ProcessoDao {
@@ -17,14 +15,14 @@ public class ProcessoDao {
         ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        String sql = "INSERT INTO Processo (pid, nome, usoCpu, usoRam, bytesUtilizados, memoriaVirtual, fkComputador, dataHora) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Processo (pid, nome, fkComputador, dataHora) VALUES (?, ?, ?, ?)";
 
         try {
             // Salvando no banco local
-            con.update(sql, processo.getPid(), processo.getNome(), BigDecimal.valueOf(processo.getUsoCpu()).setScale(2, RoundingMode.HALF_UP), BigDecimal.valueOf(processo.getUsoRam()).setScale(2, RoundingMode.HALF_UP), processo.getBytesUtilizados(), processo.getMemoriaVirtual(), processo.getFkComputador(), processo.getDataHora());
+            con.update(sql, processo.getPid(), processo.getNome(), processo.getFkComputador(), processo.getDataHora());
 
             // Salvando no banco do servidor
-            conServer.update(sql, processo.getPid(), processo.getNome(), BigDecimal.valueOf(processo.getUsoCpu()).setScale(2, RoundingMode.HALF_UP), BigDecimal.valueOf(processo.getUsoRam()).setScale(2, RoundingMode.HALF_UP), processo.getBytesUtilizados(), processo.getMemoriaVirtual(), processo.getFkComputador(), processo.getDataHora());
+            conServer.update(sql, processo.getPid(), processo.getNome(), processo.getFkComputador(), processo.getDataHora());
 
         } catch (Exception e) {
             // Trate exceções (log, relatório de erro, etc.)
@@ -50,20 +48,20 @@ public class ProcessoDao {
         }
     }
 
-    public Processo buscarPeloPid(Integer pid) {
+    public Processo buscarPeloPidEFkComputador(Integer pid, Integer fkComputador) {
         ConexaoMySQL conexao = new ConexaoMySQL();
         JdbcTemplate con = conexao.getConexaoDoBanco();
         ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        String sql = "SELECT * FROM Processo WHERE pid = ? ORDER BY dataHora DESC LIMIT 1";
+        String sql = "SELECT * FROM Processo WHERE pid = ? AND fkComputador = ? ORDER BY dataHora DESC LIMIT 1";
 
         try {
             // Buscando no banco local
-            Processo processoLocal = con.queryForObject(sql, new BeanPropertyRowMapper<>(Processo.class), pid);
+            Processo processoLocal = con.queryForObject(sql, new BeanPropertyRowMapper<>(Processo.class), pid, fkComputador);
 
             // Buscando no banco do servidor
-            Processo processoServer = conServer.queryForObject(sql, new BeanPropertyRowMapper<>(Processo.class), pid);
+            Processo processoServer = conServer.queryForObject(sql, new BeanPropertyRowMapper<>(Processo.class), pid, fkComputador);
 
             // Escolha qual processo retornar (pode ser lógica de negócios específica)
             return (processoLocal != null) ? processoLocal : processoServer;

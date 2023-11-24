@@ -40,7 +40,7 @@ public class EmpresaDao {
         String sql = "INSERT INTO Empresa (idEmpresa, razaoSocial, nomeFantasia, apelido, cnpj) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE razaoSocial = ?, nomeFantasia = ?, apelido = ?, cnpj = ?";
 
         try {
-            con.update(sql, new BeanPropertyRowMapper<>(Computador.class), empresa.getIdEmpresa(), empresa.getRazaoSocial(), empresa.getNomeFantasia(), empresa.getApelido(), empresa.getCnpj(), empresa.getIdEmpresa(), empresa.getRazaoSocial(), empresa.getNomeFantasia(), empresa.getApelido(), empresa.getCnpj());
+            con.update(sql, empresa.getIdEmpresa(), empresa.getRazaoSocial(), empresa.getNomeFantasia(), empresa.getApelido(), empresa.getCnpj(), empresa.getRazaoSocial(), empresa.getNomeFantasia(), empresa.getApelido(), empresa.getCnpj());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

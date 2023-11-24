@@ -14,22 +14,13 @@ public class Janela {
     public Janela() {
     }
 
-    public Janela(Integer pid, String comando, String titulo, Integer visibilidade, Integer fkComputador, LocalDateTime dataHora) {
+    public Janela(Integer pid, String comando, String titulo, Integer visibilidade, Integer fkComputador) {
         this.pid = pid;
         this.comando = comando;
         this.titulo = titulo;
         this.visibilidade = visibilidade;
         this.fkComputador = fkComputador;
-        this.dataHora = dataHora;
-    }
-
-    public Janela(Integer pid, Integer idLocalJanela, String comando, String titulo, String posicao, Integer visibilidade, Integer fkComputador, Integer fkProcesso, LocalDateTime dataHora) {
-        this.pid = pid;
-        this.comando = comando;
-        this.titulo = titulo;
-        this.visibilidade = visibilidade;
-        this.fkComputador = fkComputador;
-        this.dataHora = dataHora;
+        this.dataHora = LocalDateTime.now();
     }
 
     public Integer getIdJanela() {

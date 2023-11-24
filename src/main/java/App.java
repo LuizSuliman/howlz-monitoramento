@@ -73,28 +73,31 @@ public class App {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                List<String> statusComponentes = new ArrayList<>();
+                List<String> alertas = new ArrayList<>();
                 for (Componente componente : componentes) {
                     try {
-                        statusComponentes.add(howlz.monitorarComponentes(componente, computador));
+                        String retornoStatus = howlz.monitorarComponentes(componente, computador);
+                        if (retornoStatus.equalsIgnoreCase("alerta") || retornoStatus.equalsIgnoreCase("crítico")) {
+                            alertas.add(retornoStatus);
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
 
-                String estadoCritico = howlz.verificarEstadoCritico();
-                if (estadoCritico) {
+                // String estadoCritico = howlz.verificarEstadoCritico();
+                if (alertas.size() > 0) {
                     List<Processo> processos = looca.getGrupoDeProcessos().getProcessos();
                     for (Processo processo : processos) {
                         howlz.monitorarProcessos(processo, computador.getIdComputador());
                     }
-                } else if () {
+
 
                 }
 
                 List<Janela> janelas = looca.getGrupoDeJanelas().getJanelasVisiveis();
                 for (Janela janela : janelas) {
-                    howlz.monitorarJanelas(janela, computador.getIdComputador(), estadoCritico);
+                    howlz.monitorarJanelas(janela, computador.getIdComputador(), (alertas.size() > 0));
                 }
 
                 System.out.println("Fim do Timer");

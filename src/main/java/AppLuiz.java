@@ -1,3 +1,4 @@
+/*
 import com.github.britooo.looca.api.core.Looca;
 import com.github.britooo.looca.api.group.janelas.Janela;
 import com.github.britooo.looca.api.group.processos.Processo;
@@ -108,3 +109,4 @@ public class AppLuiz {
         }, delay, intervalo);
     }
 }
+*/

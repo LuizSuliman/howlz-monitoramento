@@ -12,11 +12,11 @@ public class Processo {
     public Processo() {
     }
 
-    public Processo(Integer pid, String nome, Integer fkComputador, LocalDateTime dataHora) {
+    public Processo(Integer pid, String nome, Integer fkComputador) {
         this.pid = pid;
         this.nome = nome;
         this.fkComputador = fkComputador;
-        this.dataHora = dataHora;
+        this.dataHora = LocalDateTime.now();
     }
 
     public Integer getIdProcesso() {
