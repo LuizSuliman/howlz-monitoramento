@@ -7,6 +7,8 @@ import com.github.britooo.looca.api.group.janelas.Janela;
 import com.github.britooo.looca.api.group.processos.Processo;
 import dao.*;
 import modelo.*;
+import org.checkerframework.checker.units.qual.A;
+import org.checkerframework.checker.units.qual.C;
 import oshi.SystemInfo;
 import oshi.hardware.GraphicsCard;
 
@@ -14,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import com.github.britooo.looca.api.util.Conversor;
 
@@ -22,12 +25,12 @@ public class Howlz {
     EmpresaDao empresaDao = new EmpresaDao();
     ComputadorDao computadorDao = new ComputadorDao();
     ComponenteDao componenteDao = new ComponenteDao();
+    AssociacaoComputadorUsuarioDao associacaoComputadorUsuarioDao = new AssociacaoComputadorUsuarioDao();
     MonitoramentoComponenteDao monitoramentoComponenteDao = new MonitoramentoComponenteDao();
     MonitoramentoProcessoDao monitoramentoProcessoDao = new MonitoramentoProcessoDao();
     ProcessoDao processoDao = new ProcessoDao();
     JanelaDao janelaDao = new JanelaDao();
     Looca looca = new Looca();
-    SystemInfo si = new SystemInfo();
 
     // Login
     public Boolean validarLogin(String email, String senha) {
@@ -60,23 +63,23 @@ public class Howlz {
         computadorDao.salvar(computador);
     }
 
-    public void associarComputadorAoUsuario(String codigoPatrimonio, Integer idEmpresa) {
-        Computador computador = new Computador(
-                codigoPatrimonio,
-                looca.getSistema().getSistemaOperacional(),
-                looca.getProcessador().getId(),
-                idEmpresa
+    public void associarComputadorAoUsuario(Usuario usuario, Computador computador) {
+        AssociacaoComputadorUsuario associacaoComputadorUsuario = new AssociacaoComputadorUsuario(
+                usuario.getIdUsuario(),
+                computador.getIdComputador(),
+                LocalDateTime.now(),
+                null
         );
-        computadorDao.salvar(computador);
+        associacaoComputadorUsuarioDao.salvar(associacaoComputadorUsuario);
     }
 
-    public void cadastrarNovosComponentes(String numeroSerial) {
+    public void cadastrarNovosComponentes(Computador computador) {
         SystemInfo si = new SystemInfo();
-        Computador computador = computadorDao.buscarPeloSerial(numeroSerial);
+        computador.setComponentes(new ArrayList<>());
         Componente cpu = new Componente(looca.getProcessador().getNome(), looca.getProcessador().getId(), computador.getIdComputador(), 1);
         computador.adicionarComponente(cpu);
         componenteDao.salvar(cpu);
-        Componente ram = new Componente("Memória RAM ".concat(Conversor.formatarBytes(looca.getMemoria().getDisponivel())), "N/A", computador.getIdComputador(), 2);
+        Componente ram = new Componente(String.format("Memória RAM %s", Conversor.formatarBytes(looca.getMemoria().getTotal())), "N/A", computador.getIdComputador(), 2);
         computador.adicionarComponente(ram);
         componenteDao.salvar(ram);
         DiscoGrupo discoGrupo = looca.getGrupoDeDiscos();
@@ -92,7 +95,6 @@ public class Howlz {
             computador.adicionarComponente(gpu);
             componenteDao.salvar(gpu);
         }
-        System.out.println(computador.getComponentes());
     }
 
     public String monitorarComponentes(Componente componente, Computador computador) throws IOException {
@@ -104,32 +106,30 @@ public class Howlz {
                 valor = looca.getProcessador().getUso();
                 MonitoramentoComponente usoCpu = new MonitoramentoComponente(
                         valor,
-                        101,
+                        1,
                         componente.getIdComponente()
                 );
                 monitoramentoComponenteDao.salvar(usoCpu);
-                System.out.println(usoCpu);
                 if (valor > 90.) {
-                    return "Alerta";
+                    return String.format("Crítico: Uso de CPU acima de 90%% no computador de código %s", computador.getCodigoPatrimonio());
                 } else if (valor > 80.) {
-                    return "Crítico";
+                    return String.format("Alerta: Uso de CPU acima de 80%% no computador de código %s", computador.getCodigoPatrimonio());
                 } else {
                     return "Bom";
                 }
             case 2: // RAM
                 // Uso de RAM
-                valor = looca.getMemoria().getEmUso().doubleValue() / (1024 * 1024 * 1024);
+                valor = (looca.getMemoria().getEmUso().doubleValue() / (looca.getMemoria().getTotal().doubleValue())) * 100.;
                 MonitoramentoComponente usoRam = new MonitoramentoComponente(
                         valor,
-                        201,
+                        2,
                         componente.getIdComponente()
                 );
                 monitoramentoComponenteDao.salvar(usoRam);
-                System.out.println(usoRam);
                 if (valor > 95.) {
-                    return "Alerta";
+                    return String.format("Crítico: Uso de RAM acima de 95%% no computador de código %s", computador.getCodigoPatrimonio());
                 } else if (valor > 90.) {
-                    return "Crítico";
+                    return String.format("Alerta: Uso de RAM acima de 90%% no computador de código %s", computador.getCodigoPatrimonio());
                 } else {
                     return "Bom";
                 }
@@ -138,22 +138,21 @@ public class Howlz {
                 List<Disco> discos = looca.getGrupoDeDiscos().getDiscos();
                 Disco discoCerto = discos.get(0);
                 for (Disco discoAtual : discos) {
-                    if (discoAtual.getSerial().equals(componenteDao.buscarSerialDiscoPeloId(componente.getIdComponente()).getIdentificador())) {
+                    if (discoAtual.getSerial().equals(componenteDao.buscarPeloIdentificador(componente.getIdentificador()).getIdentificador())) {
                         discoCerto = discoAtual;
                     }
                 }
                 valor = ((discoCerto.getBytesDeEscritas().doubleValue() + discoCerto.getBytesDeLeitura().doubleValue()) / discoCerto.getTamanho().doubleValue()) * 100.;
                 MonitoramentoComponente usoDisco = new MonitoramentoComponente(
                         valor,
-                        301,
+                        3,
                         componente.getIdComponente()
                 );
                 monitoramentoComponenteDao.salvar(usoDisco);
-                System.out.println(usoDisco);
                 if (valor > 90.) {
-                    return "Alerta";
+                    return String.format("Crítico: Uso de Disco acima de 90%% no computador de código %s", computador.getCodigoPatrimonio());
                 } else if (valor > 85.) {
-                    return "Crítico";
+                    return String.format("Alerta: Uso de Disco acima de 85%% no computador de código %s", computador.getCodigoPatrimonio());
                 } else {
                     return "Bom";
                 }
@@ -166,9 +165,10 @@ public class Howlz {
                     } else if (componente.getModelo().toLowerCase().contains("amd")) {
                         comando = Runtime.getRuntime().exec("nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits");
                     } else if (componente.getModelo().toLowerCase().contains("intel")) {
-                        comando = Runtime.getRuntime().exec("echo 30.00");
+                        // comando = Runtime.getRuntime().exec("echo 30.00");
+                        return "GPU Inválida";
                     } else {
-                        System.out.println("Placa de vídeo não conpátivel com o monitoramento");
+                        System.out.println("Placa de vídeo não compatível com o monitoramento");
                         break;
                     }
                 } else if (computador.getSistemaOperacional().toLowerCase().contains("windows")) {
@@ -177,70 +177,88 @@ public class Howlz {
                     } else if (componente.getModelo().toLowerCase().contains("nvidia")) {
                         comando = Runtime.getRuntime().exec("nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits");
                     } else if (componente.getModelo().toLowerCase().contains("intel")) {
-                        comando = Runtime.getRuntime().exec("echo 30.00");
+                        // comando = Runtime.getRuntime().exec("echo 30.00");
+                        return "GPU Inválida";
                     } else {
                         System.out.println("Placa de vídeo não conpátivel com o monitoramento");
-                        return null;
+                        return "GPU Inválida";
                     }
                 } else {
                     System.out.println("Sistema operacional não compatível com monitoramento de GPU.");
-                    return null;
+                    return "Sistema não suportado";
                 }
 
                 // Output final
                 BufferedReader output = new BufferedReader(new InputStreamReader(comando.getInputStream()));
-                System.out.println(output.readLine());
+                String retorno = output.readLine();
 
-                valor = Double.valueOf(output.readLine());
+                if (retorno != null) {
+                    valor = Double.valueOf(retorno);
+                } else {
+                    valor = 0.;
+                }
+
+                output.close();
                 MonitoramentoComponente usoGPU = new MonitoramentoComponente(
                         valor,
-                        401,
+                        4,
                         componente.getIdComponente()
                 );
                 monitoramentoComponenteDao.salvar(usoGPU);
                 if (valor > 90.) {
-                    return "Alerta";
+                    return String.format("Crítico: Uso de GPU acima de 90%% no computador de código %s", computador.getCodigoPatrimonio());
                 } else if (valor > 80.) {
-                    return "Crítico";
+                    return String.format("Alerta: Uso de GPU acima de 80%% no computador de código %s", computador.getCodigoPatrimonio());
                 } else {
                     return "Bom";
                 }
             default:
                 System.out.println("Tipo inválido");
         }
-        return null;
+        return "Bom";
     }
 
-    public void monitorarProcessos(Processo processoLooca, Integer idComputador) {
+    public modelo.Processo monitorarProcessos(Processo processoLooca, Integer idComputador) {
         modelo.Processo processo = new modelo.Processo(processoLooca.getPid(), processoLooca.getNome(), idComputador);
-        processoDao.salvar(processo);
-
-        modelo.Processo processoDoBanco = processoDao.buscarPeloPidEFkComputador(processoLooca.getPid(), idComputador);
-
-        MonitoramentoProcesso usoCpuProcesso = new MonitoramentoProcesso(processoLooca.getUsoCpu(), processoDoBanco.getIdProcesso(), 1, idComputador);
-        MonitoramentoProcesso usoRamProcesso = new MonitoramentoProcesso(processoLooca.getUsoMemoria(), processoDoBanco.getIdProcesso(), 1, idComputador);
-
-        monitoramentoProcessoDao.salvar(usoCpuProcesso);
-        monitoramentoProcessoDao.salvar(usoRamProcesso);
+        return processo;
     }
 
-    public void monitorarJanelas(Janela janelaLooca, Integer idComputador, Boolean estadoCritico) {
-        Integer visibilidade = (janelaLooca.isVisivel()) ?  1 : 0;
+    public void salvarProcessos(List<modelo.Processo> processos) {
+        processoDao.salvarMultiplos(processos);
+    }
+
+    public MonitoramentoProcesso monitorarUsoProcessos(Integer idProcesso, Integer idTipoComponente, Double uso, Integer idUnidadeMedida) {
+        return new MonitoramentoProcesso(uso, idProcesso, idUnidadeMedida, idTipoComponente);
+    }
+
+    public void salvarMonitoramentoProcessos(List<MonitoramentoProcesso> monitoramentoProcessos) {
+        monitoramentoProcessoDao.salvarMultiplos(monitoramentoProcessos);
+    }
+
+    public modelo.Janela monitorarJanelas(Janela janelaLooca, Integer idComputador) {
+        Integer visibilidade = (janelaLooca.isVisivel()) ? 1 : 0;
         modelo.Janela janela = new modelo.Janela(janelaLooca.getPid().intValue(), janelaLooca.getComando(), janelaLooca.getTitulo(), visibilidade, idComputador);
-//        if (estadoCritico) {
-//            modelo.Processo processoRelacionado = processoDao.buscarPeloPid(janelaLooca.getPid().intValue());
-//            janela.setFkProcesso(processoRelacionado.getIdProcesso());
-//        }
-        janelaDao.salvar(janela);
+        return janela;
     }
 
-//    public String verificarEstadoCritico() {
-//        if (looca.getProcessador().getUso() > 80.0 || looca.getMemoria().getEmUso() > (looca.getMemoria().getTotal() - (looca.getMemoria().getTotal() / 10)) || looca.getMemoria().getEmUso() > (looca.getMemoria().getTotal() - (looca.getMemoria().getTotal() / 10))) {
-//            return "Crítico";
-//        } else if () {
-//            return "Alerta";
-//        } else {
-//            return "Bom";
-//        }
-//    }
+    public void salvarJanelas(List<modelo.Janela> janelas) {
+        janelaDao.salvarMultiplos(janelas);
+    }
+
+    public List<String> alertasPassados = new ArrayList<>();
+
+    public void enviarAlertas(List<String> alertas) throws IOException {
+        for (String alerta : alertas) {
+            Boolean enviadoRecentemente = false;
+            for (String alertaPassado : alertasPassados) {
+                if (alerta.equalsIgnoreCase(alertaPassado)) {
+                    enviadoRecentemente = true;
+                }
+            }
+            if (!enviadoRecentemente) {
+                Slack.enviarMensagem(alerta);
+            }
+        }
+        alertasPassados = alertas;
+    }
 }

@@ -20,19 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HowlzLuiz extends Howlz {
-    public List<String> estadoCritico() {
-        List<String> razoesEstadoCritico = new ArrayList<>();
-        // if (looca.getProcessador().getUso() > 90.0) {
-        if (looca.getProcessador().getUso() > 0.) {
-            razoesEstadoCritico.add("Uso da CPU acima de 90%");
-        }
-        // if (looca.getMemoria().getEmUso() > (looca.getMemoria().getTotal() - (looca.getMemoria().getTotal() / 10))) {
-        if (looca.getMemoria().getEmUso() > (looca.getMemoria().getTotal() - (looca.getMemoria().getTotal()))) {
-            razoesEstadoCritico.add("Uso da Memória RAM acima de 90%");
-        }
-        return razoesEstadoCritico;
-    }
-
     // Projeto Individual do Luíz: Notificações de Alerta no Windows
 
     // Instânciando SystemTray do Computador, para adicionar a aplicação à Barra de Tarefas:

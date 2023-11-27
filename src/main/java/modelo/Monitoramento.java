@@ -1,8 +1,6 @@
 package modelo;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.TimerTask;
 
 public class Monitoramento {
     protected LocalDateTime dataHora;
@@ -12,7 +10,7 @@ public class Monitoramento {
     }
 
     public Monitoramento(Double valor) {
-        this.dataHora = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm:ss")));
+        this.dataHora = LocalDateTime.now();
         this.valor = valor;
     }
 

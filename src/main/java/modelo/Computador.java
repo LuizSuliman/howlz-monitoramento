@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Computador {
     private Integer idComputador;
-    private String codigoPatimonio;
+    private String codigoPatrimonio;
     private String sistemaOperacional;
     private String numeroSerial;
     private Integer fkEmpresa;
@@ -14,8 +14,8 @@ public class Computador {
     public Computador() {
     }
 
-    public Computador(String codigoPatimonio, String sistemaOperacional, String numeroSerial, Integer fkEmpresa) {
-        this.codigoPatimonio = codigoPatimonio;
+    public Computador(String codigoPatrimonio, String sistemaOperacional, String numeroSerial, Integer fkEmpresa) {
+        this.codigoPatrimonio = codigoPatrimonio;
         this.sistemaOperacional = sistemaOperacional;
         this.numeroSerial = numeroSerial;
         this.fkEmpresa = fkEmpresa;
@@ -34,12 +34,12 @@ public class Computador {
         this.idComputador = idComputador;
     }
 
-    public String getCodigoPatimonio() {
-        return codigoPatimonio;
+    public String getCodigoPatrimonio() {
+        return codigoPatrimonio;
     }
 
-    public void setCodigoPatimonio(String codigoPatimonio) {
-        this.codigoPatimonio = codigoPatimonio;
+    public void setCodigoPatrimonio(String codigoPatrimonio) {
+        this.codigoPatrimonio = codigoPatrimonio;
     }
 
     public String getSistemaOperacional() {
@@ -81,6 +81,6 @@ public class Computador {
                 Código do Patrimônio: %s
                 Número Serial: %s
                 Sistema Operacional: %s
-                Empresa (FK): %d""".formatted(idComputador, codigoPatimonio, numeroSerial, sistemaOperacional, fkEmpresa, componentes);
+                Empresa (FK): %d""".formatted(idComputador, codigoPatrimonio, numeroSerial, sistemaOperacional, fkEmpresa, componentes);
     }
 }

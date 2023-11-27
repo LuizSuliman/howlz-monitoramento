@@ -20,10 +20,10 @@ public class ComputadorDao {
 
         try {
             // Salvando no banco local
-            con.update(sql, novoComputador.getCodigoPatimonio(), novoComputador.getSistemaOperacional(), novoComputador.getNumeroSerial(), novoComputador.getFkEmpresa());
+            con.update(sql, novoComputador.getCodigoPatrimonio(), novoComputador.getSistemaOperacional(), novoComputador.getNumeroSerial(), novoComputador.getFkEmpresa());
 
             // Salvando no banco do servidor
-            conServer.update(sql, novoComputador.getCodigoPatimonio(), novoComputador.getSistemaOperacional(), novoComputador.getNumeroSerial(), novoComputador.getFkEmpresa());
+            conServer.update(sql, novoComputador.getCodigoPatrimonio(), novoComputador.getSistemaOperacional(), novoComputador.getNumeroSerial(), novoComputador.getFkEmpresa());
 
         } catch (Exception e) {
             // Trate exceções (log, relatório de erro, etc.)
@@ -140,13 +140,14 @@ public class ComputadorDao {
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
         String sql = "SELECT * FROM Computador WHERE numeroSerial = ? LIMIT 1";
+        String sqlServer = "SELECT TOP 1 * FROM Computador WHERE numeroSerial = ?";
 
         try {
             // Buscando no banco local
             Computador computadorLocal = con.queryForObject(sql, new BeanPropertyRowMapper<>(Computador.class), numeroSerial);
 
             // Buscando no banco do servidor
-            Computador computadorServer = conServer.queryForObject(sql, new BeanPropertyRowMapper<>(Computador.class), numeroSerial);
+            Computador computadorServer = conServer.queryForObject(sqlServer, new BeanPropertyRowMapper<>(Computador.class), numeroSerial);
 
             // Escolha qual computador retornar (pode ser lógica de negócios específica)
             return (computadorLocal != null) ? computadorLocal : computadorServer;

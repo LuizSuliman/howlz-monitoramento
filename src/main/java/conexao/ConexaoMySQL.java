@@ -23,8 +23,8 @@ public class ConexaoMySQL {
         */
         dataSource.setUrl("jdbc:mysql://localhost:3306/howlz");
         // ALTERAR VALORES ABAIXO PARA SUAS CREDENCIAIS DO MYSQL
-        dataSource.setUsername("aluno");
-        dataSource.setPassword("aluno");
+        dataSource.setUsername("root");
+        dataSource.setPassword("luizbd");
 
         conexaoDoBanco = new JdbcTemplate(dataSource);
     }

@@ -3,9 +3,11 @@ import com.github.britooo.looca.api.group.janelas.Janela;
 import com.github.britooo.looca.api.group.processos.Processo;
 import dao.ComponenteDao;
 import dao.ComputadorDao;
+import dao.ProcessoDao;
 import dao.UsuarioDao;
 import modelo.Componente;
 import modelo.Computador;
+import modelo.MonitoramentoProcesso;
 import modelo.Usuario;
 import oshi.SystemInfo;
 import servico.Howlz;
@@ -18,10 +20,10 @@ public class App {
         Scanner in = new Scanner(System.in);
         Howlz howlz = new Howlz();
         Looca looca = new Looca();
-        SystemInfo si = new SystemInfo();
         UsuarioDao usuarioDao = new UsuarioDao();
         ComputadorDao computadorDao = new ComputadorDao();
         ComponenteDao componenteDao = new ComponenteDao();
+        ProcessoDao processoDao = new ProcessoDao();
 
         String continuarOuNao = "";
         Boolean cadastroValidado = false;
@@ -58,8 +60,11 @@ public class App {
         if (howlz.computadorNaoCadastrado(looca.getProcessador().getId())) {
             System.out.println("Este computador ainda não está na nossa base de dados.\nQual o código de patrimônio que sua empresa usa para identificá-lo?");
             String codigo = in.next();
+            System.out.println("Cadastrando computador...");
             howlz.cadastrarNovoComputador(codigo, usuarioLogado.getFkEmpresa());
-            howlz.cadastrarNovosComponentes(looca.getProcessador().getId());
+            Computador computador = computadorDao.buscarPeloSerial(looca.getProcessador().getId());
+            howlz.cadastrarNovosComponentes(computador);
+            howlz.associarComputadorAoUsuario(usuarioLogado, computador);
         }
 
         Computador computador = computadorDao.buscarPeloSerial(looca.getProcessador().getId());
@@ -68,16 +73,17 @@ public class App {
         // Agendamendo tarefa de monitoramento:
         Timer timer = new Timer();
         int delay = 0; // Atraso inicial
-        int intervalo = 15000; // Intervalo de tempo em milissegundos
+        int intervalo = 30000; // Intervalo de tempo em milissegundos
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                System.out.println("Monitorando...");
                 List<String> alertas = new ArrayList<>();
                 for (Componente componente : componentes) {
                     try {
                         String retornoStatus = howlz.monitorarComponentes(componente, computador);
-                        if (retornoStatus.equalsIgnoreCase("alerta") || retornoStatus.equalsIgnoreCase("crítico")) {
+                        if (retornoStatus.contains("Alerta") || retornoStatus.contains("Crítico")) {
                             alertas.add(retornoStatus);
                         }
                     } catch (IOException e) {
@@ -88,19 +94,34 @@ public class App {
                 // String estadoCritico = howlz.verificarEstadoCritico();
                 if (alertas.size() > 0) {
                     List<Processo> processos = looca.getGrupoDeProcessos().getProcessos();
-                    for (Processo processo : processos) {
-                        howlz.monitorarProcessos(processo, computador.getIdComputador());
+                    List<modelo.Processo> processosModelo = new ArrayList<>();
+                    List<MonitoramentoProcesso> monitoramentoProcessos = new ArrayList<>();
+
+                    processos.sort(Comparator.comparing(Processo::getUsoMemoria));
+                    Integer totalProcessos = processoDao.contarTodos();
+                    for (int i = processos.size() - 1; i > processos.size() - 6; i --) {
+                        processosModelo.add(howlz.monitorarProcessos(processos.get(i), computador.getIdComputador()));
+                        totalProcessos ++;
+                        monitoramentoProcessos.add(howlz.monitorarUsoProcessos(totalProcessos, 1, processos.get(i).getUsoCpu(), 1));
+                        monitoramentoProcessos.add(howlz.monitorarUsoProcessos(totalProcessos, 2, processos.get(i).getUsoMemoria(), 2));
                     }
 
+                    howlz.salvarProcessos(processosModelo);
+                    howlz.salvarMonitoramentoProcessos(monitoramentoProcessos);
 
+                    try {
+                        howlz.enviarAlertas(alertas);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 List<Janela> janelas = looca.getGrupoDeJanelas().getJanelasVisiveis();
+                List<modelo.Janela> janelasModelo = new ArrayList<>();
                 for (Janela janela : janelas) {
-                    howlz.monitorarJanelas(janela, computador.getIdComputador(), (alertas.size() > 0));
+                    janelasModelo.add(howlz.monitorarJanelas(janela, computador.getIdComputador()));
                 }
-
-                System.out.println("Fim do Timer");
+                howlz.salvarJanelas(janelasModelo);
             }
         }, delay, intervalo);
     }

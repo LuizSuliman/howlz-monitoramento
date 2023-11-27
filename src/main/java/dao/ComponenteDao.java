@@ -133,20 +133,20 @@ public class ComponenteDao {
         }
     }
 
-    public Componente buscarSerialDiscoPeloId(Integer id) {
+    public Componente buscarPeloIdentificador(String identificador) {
         ConexaoMySQL conexao = new ConexaoMySQL();
         JdbcTemplate con = conexao.getConexaoDoBanco();
         ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        String sql = "SELECT numeroSerial FROM Componente WHERE tipo = 'DISCO' AND idComponente = ?";
+        String sql = "SELECT * FROM Componente WHERE fkTipoComponente = 3 AND identificador = ?";
 
         try {
             // Buscando no banco local
-            Componente componenteLocal = con.queryForObject(sql, (Componente.class), id);
+            Componente componenteLocal = con.queryForObject(sql, new BeanPropertyRowMapper<>(Componente.class), identificador);
 
             // Buscando no banco do servidor
-            Componente componenteServer = conServer.queryForObject(sql, (Componente.class), id);
+            Componente componenteServer = conServer.queryForObject(sql, new BeanPropertyRowMapper<>(Componente.class), identificador);
 
             // Escolha qual componente retornar (pode ser lógica de negócios específica)
             return (componenteLocal != null) ? componenteLocal : componenteServer;
