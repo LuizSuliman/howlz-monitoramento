@@ -13,7 +13,7 @@ public class Slack {
                 .url("https://slack.com/api/chat.postMessage")
                 .method("POST", body)
                 .addHeader("Content-type", "application/json")
-                .addHeader("Authorization", "Bearer xoxb-5974232116754-6152291014470-h9MjCx6OdYn9keCXqTbcZtAO") // REMOVER TOKEN ANTES DE SUBIR NO GIT
+                .addHeader("Authorization", "Bearer ???") // REMOVER TOKEN ANTES DE SUBIR NO GIT
                 .build();
         Response response = client.newCall(request).execute();
         response.body().close();
