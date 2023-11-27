@@ -50,8 +50,8 @@ public class ComponenteDao {
     }
 
     public List<Componente> buscarTodosPeloIdComputador(Integer idComputador) {
-        ConexaoMySQL conexao = new ConexaoMySQL();
-        JdbcTemplate con = conexao.getConexaoDoBanco();
+        // ConexaoMySQL conexao = new ConexaoMySQL();
+        // JdbcTemplate con = conexao.getConexaoDoBanco();
         ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
@@ -59,12 +59,13 @@ public class ComponenteDao {
 
         try {
             // Buscando no banco local
-            List<Componente> componentesLocal = con.query(sql, new BeanPropertyRowMapper<>(Componente.class), idComputador);
+            // List<Componente> componentesLocal = con.query(sql, new BeanPropertyRowMapper<>(Componente.class), idComputador);
 
             // Buscando no banco do servidor
             List<Componente> componentesServer = conServer.query(sql, new BeanPropertyRowMapper<>(Componente.class), idComputador);
 
-            return (componentesLocal != null) ? componentesLocal : componentesServer;
+            // return (componentesLocal != null) ? componentesLocal : componentesServer;
+            return componentesServer;
 
         } catch (Exception e) {
             // Trate exceções (log, relatório de erro, etc.)
@@ -73,13 +74,13 @@ public class ComponenteDao {
 
         } finally {
             // Certifique-se de fechar as conexões, mesmo se ocorrer uma exceção
-            if (con != null) {
+            /*if (con != null) {
                 try {
                     con.getDataSource().getConnection().close();
                 } catch (SQLException e) {
                     e.printStackTrace(); // Trate a exceção de fechamento da conexão local
                 }
-            }
+            }*/
 
             if (conServer != null) {
                 try {
@@ -133,20 +134,20 @@ public class ComponenteDao {
         }
     }
 
-    public Componente buscarPeloIdentificador(String identificador) {
+    public Componente buscarPeloIdentificador(String identificador, Integer idComputador) {
         ConexaoMySQL conexao = new ConexaoMySQL();
         JdbcTemplate con = conexao.getConexaoDoBanco();
         ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        String sql = "SELECT * FROM Componente WHERE fkTipoComponente = 3 AND identificador = ?";
+        String sql = "SELECT * FROM Componente WHERE fkTipoComponente = 3 AND identificador = ? AND fkComputador = ?";
 
         try {
             // Buscando no banco local
-            Componente componenteLocal = con.queryForObject(sql, new BeanPropertyRowMapper<>(Componente.class), identificador);
+            Componente componenteLocal = con.queryForObject(sql, new BeanPropertyRowMapper<>(Componente.class), identificador, idComputador);
 
             // Buscando no banco do servidor
-            Componente componenteServer = conServer.queryForObject(sql, new BeanPropertyRowMapper<>(Componente.class), identificador);
+            Componente componenteServer = conServer.queryForObject(sql, new BeanPropertyRowMapper<>(Componente.class), identificador, idComputador);
 
             // Escolha qual componente retornar (pode ser lógica de negócios específica)
             return (componenteLocal != null) ? componenteLocal : componenteServer;

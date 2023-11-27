@@ -134,8 +134,8 @@ public class ComputadorDao {
     }
 
     public Computador buscarPeloSerial(String numeroSerial) {
-        ConexaoMySQL conexao = new ConexaoMySQL();
-        JdbcTemplate con = conexao.getConexaoDoBanco();
+        // ConexaoMySQL conexao = new ConexaoMySQL();
+        // JdbcTemplate con = conexao.getConexaoDoBanco();
         ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
@@ -144,13 +144,14 @@ public class ComputadorDao {
 
         try {
             // Buscando no banco local
-            Computador computadorLocal = con.queryForObject(sql, new BeanPropertyRowMapper<>(Computador.class), "%" + numeroSerial + "%");
+            // Computador computadorLocal = con.queryForObject(sql, new BeanPropertyRowMapper<>(Computador.class), "%" + numeroSerial + "%");
 
             // Buscando no banco do servidor
             Computador computadorServer = conServer.queryForObject(sqlServer, new BeanPropertyRowMapper<>(Computador.class), "%" + numeroSerial + "%");
 
             // Escolha qual computador retornar (pode ser lógica de negócios específica)
-            return (computadorLocal != null) ? computadorLocal : computadorServer;
+            // return (computadorLocal != null) ? computadorLocal : computadorServer;
+            return computadorServer;
 
         } catch (Exception e) {
             // Trate exceções (log, relatório de erro, etc.)
@@ -159,13 +160,13 @@ public class ComputadorDao {
 
         } finally {
             // Certifique-se de fechar as conexões, mesmo se ocorrer uma exceção
-            if (con != null) {
+            /*if (con != null) {
                 try {
                     con.getDataSource().getConnection().close();
                 } catch (SQLException e) {
                     e.printStackTrace(); // Trate a exceção de fechamento da conexão local
                 }
-            }
+            }*/
 
             if (conServer != null) {
                 try {

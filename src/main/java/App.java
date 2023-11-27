@@ -9,9 +9,7 @@ import modelo.Componente;
 import modelo.Computador;
 import modelo.MonitoramentoProcesso;
 import modelo.Usuario;
-import oshi.SystemInfo;
 import servico.Howlz;
-import servico.Slack;
 
 import java.io.IOException;
 import java.util.*;
@@ -57,7 +55,6 @@ public class App {
         howlz.atualizarEmpresaDoUsuarioLocal(usuarioLogado.getFkEmpresa());
         howlz.atualizarUsuarioLocal(usuarioLogado);
 
-        System.out.println(looca.getRede().getGrupoDeInterfaces().getInterfaces().get(1).getEnderecoMac());
         // Cadastro de novos computadores:
         if (howlz.computadorNaoCadastrado(looca.getRede().getGrupoDeInterfaces().getInterfaces().get(1).getEnderecoMac())) {
             System.out.println("Este computador ainda não está na nossa base de dados.\nQual o código de patrimônio que sua empresa usa para identificá-lo?");

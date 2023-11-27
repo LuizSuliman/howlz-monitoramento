@@ -147,7 +147,7 @@ public class Howlz {
                 List<Disco> discos = looca.getGrupoDeDiscos().getDiscos();
                 Disco discoCerto = discos.get(0);
                 for (Disco discoAtual : discos) {
-                    if (discoAtual.getSerial().equals(componenteDao.buscarPeloIdentificador(componente.getIdentificador()).getIdentificador())) {
+                    if (discoAtual.getSerial().equals(componenteDao.buscarPeloIdentificador(componente.getIdentificador(), computador.getIdComputador()).getIdentificador())) {
                         discoCerto = discoAtual;
                     }
                 }
@@ -168,14 +168,15 @@ public class Howlz {
             case 4: // GPU (INOVAÇÃO!)
                 // Uso de GPU
                 Process comando;
-                if (computador.getSistemaOperacional().toLowerCase().contains("linux")) {
+                if (computador.getSistemaOperacional().toLowerCase().contains("ubuntu")) {
                     if (componente.getModelo().toLowerCase().contains("amd")) {
                         comando = Runtime.getRuntime().exec("/opt/amdgpu-pro/bin/amdgpu-pro-top -n 1 -b | grep -oP \"GPU[[:space:]]+\\K[0-9]+\"\n");
                     } else if (componente.getModelo().toLowerCase().contains("amd")) {
                         comando = Runtime.getRuntime().exec("nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits");
                     } else if (componente.getModelo().toLowerCase().contains("intel")) {
                         // comando = Runtime.getRuntime().exec("echo 30.00");
-                        return "GPU Inválida";
+                        System.out.println("Placa de vídeo não compatível com o monitoramento");
+                        return "Placa de vídeo não compatível com o monitoramento";
                     } else {
                         System.out.println("Placa de vídeo não compatível com o monitoramento");
                         break;
@@ -187,7 +188,8 @@ public class Howlz {
                         comando = Runtime.getRuntime().exec("nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits");
                     } else if (componente.getModelo().toLowerCase().contains("intel")) {
                         // comando = Runtime.getRuntime().exec("echo 30.00");
-                        return "GPU Inválida";
+                        System.out.println("Placa de vídeo não conpátivel com o monitoramento");
+                        return "Placa de vídeo não compatível com o monitoramento";
                     } else {
                         System.out.println("Placa de vídeo não conpátivel com o monitoramento");
                         return "GPU Inválida";
