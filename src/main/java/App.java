@@ -11,6 +11,7 @@ import modelo.MonitoramentoProcesso;
 import modelo.Usuario;
 import oshi.SystemInfo;
 import servico.Howlz;
+import servico.Slack;
 
 import java.io.IOException;
 import java.util.*;
@@ -56,18 +57,19 @@ public class App {
         howlz.atualizarEmpresaDoUsuarioLocal(usuarioLogado.getFkEmpresa());
         howlz.atualizarUsuarioLocal(usuarioLogado);
 
+        System.out.println(looca.getRede().getGrupoDeInterfaces().getInterfaces().get(1).getEnderecoMac());
         // Cadastro de novos computadores:
-        if (howlz.computadorNaoCadastrado(looca.getProcessador().getId())) {
+        if (howlz.computadorNaoCadastrado(looca.getRede().getGrupoDeInterfaces().getInterfaces().get(1).getEnderecoMac())) {
             System.out.println("Este computador ainda não está na nossa base de dados.\nQual o código de patrimônio que sua empresa usa para identificá-lo?");
             String codigo = in.next();
             System.out.println("Cadastrando computador...");
             howlz.cadastrarNovoComputador(codigo, usuarioLogado.getFkEmpresa());
-            Computador computador = computadorDao.buscarPeloSerial(looca.getProcessador().getId());
+            Computador computador = computadorDao.buscarPeloSerial(looca.getRede().getGrupoDeInterfaces().getInterfaces().get(1).getEnderecoMac());
             howlz.cadastrarNovosComponentes(computador);
             howlz.associarComputadorAoUsuario(usuarioLogado, computador);
         }
 
-        Computador computador = computadorDao.buscarPeloSerial(looca.getProcessador().getId());
+        Computador computador = computadorDao.buscarPeloSerial(looca.getRede().getGrupoDeInterfaces().getInterfaces().get(1).getEnderecoMac());
         List<Componente> componentes = componenteDao.buscarTodosPeloIdComputador(computador.getIdComputador());
 
         // Agendamendo tarefa de monitoramento:
@@ -111,7 +113,7 @@ public class App {
 
                     try {
                         howlz.enviarAlertas(alertas);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

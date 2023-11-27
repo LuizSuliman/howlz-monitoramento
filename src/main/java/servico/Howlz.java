@@ -5,6 +5,7 @@ import com.github.britooo.looca.api.group.discos.Disco;
 import com.github.britooo.looca.api.group.discos.DiscoGrupo;
 import com.github.britooo.looca.api.group.janelas.Janela;
 import com.github.britooo.looca.api.group.processos.Processo;
+import com.github.britooo.looca.api.group.rede.RedeInterface;
 import dao.*;
 import modelo.*;
 import org.checkerframework.checker.units.qual.A;
@@ -57,10 +58,18 @@ public class Howlz {
         Computador computador = new Computador(
                 codigoPatrimonio,
                 looca.getSistema().getSistemaOperacional(),
-                looca.getProcessador().getId(),
+                gerarSerial(looca.getRede().getGrupoDeInterfaces().getInterfaces()),
                 idEmpresa
         );
         computadorDao.salvar(computador);
+    }
+
+    public String gerarSerial(List<RedeInterface> redeInterfaces) {
+        String serial = "";
+        for (RedeInterface redeInterface : redeInterfaces) {
+            serial = String.format("%s %s", serial, redeInterface.getEnderecoMac());
+        }
+        return serial;
     }
 
     public void associarComputadorAoUsuario(Usuario usuario, Computador computador) {
@@ -142,7 +151,7 @@ public class Howlz {
                         discoCerto = discoAtual;
                     }
                 }
-                valor = ((discoCerto.getBytesDeEscritas().doubleValue() + discoCerto.getBytesDeLeitura().doubleValue()) / discoCerto.getTamanho().doubleValue()) * 100.;
+                valor = (discoCerto.getBytesDeEscritas().doubleValue() / discoCerto.getTamanho().doubleValue()) * 100.;
                 MonitoramentoComponente usoDisco = new MonitoramentoComponente(
                         valor,
                         3,
@@ -247,7 +256,7 @@ public class Howlz {
 
     public List<String> alertasPassados = new ArrayList<>();
 
-    public void enviarAlertas(List<String> alertas) throws IOException {
+    public void enviarAlertas(List<String> alertas) throws Exception {
         for (String alerta : alertas) {
             Boolean enviadoRecentemente = false;
             for (String alertaPassado : alertasPassados) {

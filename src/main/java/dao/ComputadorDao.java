@@ -139,15 +139,15 @@ public class ComputadorDao {
         ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        String sql = "SELECT * FROM Computador WHERE numeroSerial = ? LIMIT 1";
-        String sqlServer = "SELECT TOP 1 * FROM Computador WHERE numeroSerial = ?";
+        String sql = "SELECT * FROM Computador WHERE numeroSerial LIKE ? LIMIT 1";
+        String sqlServer = "SELECT TOP 1 * FROM Computador WHERE numeroSerial LIKE ?";
 
         try {
             // Buscando no banco local
-            Computador computadorLocal = con.queryForObject(sql, new BeanPropertyRowMapper<>(Computador.class), numeroSerial);
+            Computador computadorLocal = con.queryForObject(sql, new BeanPropertyRowMapper<>(Computador.class), "%" + numeroSerial + "%");
 
             // Buscando no banco do servidor
-            Computador computadorServer = conServer.queryForObject(sqlServer, new BeanPropertyRowMapper<>(Computador.class), numeroSerial);
+            Computador computadorServer = conServer.queryForObject(sqlServer, new BeanPropertyRowMapper<>(Computador.class), "%" + numeroSerial + "%");
 
             // Escolha qual computador retornar (pode ser lógica de negócios específica)
             return (computadorLocal != null) ? computadorLocal : computadorServer;
@@ -183,14 +183,14 @@ public class ComputadorDao {
         ConexaoSQLServer conexaoServer = new ConexaoSQLServer();
         JdbcTemplate conServer = conexaoServer.getConexaoDoBanco();
 
-        String sql = "SELECT COUNT(*) FROM Computador WHERE numeroSerial = ?";
+        String sql = "SELECT COUNT(*) FROM Computador WHERE numeroSerial LIKE ?";
 
         try {
             // Contando no banco local
             // Integer countLocal = con.queryForObject(sql, Integer.class, numeroSerial);
 
             // Contando no banco do servidor
-            Integer countServer = conServer.queryForObject(sql, Integer.class, numeroSerial);
+            Integer countServer = conServer.queryForObject(sql, Integer.class, "%" + numeroSerial + "%");
 
             return countServer;
 
