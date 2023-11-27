@@ -13,11 +13,11 @@ import org.checkerframework.checker.units.qual.C;
 import oshi.SystemInfo;
 import oshi.hardware.GraphicsCard;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import com.github.britooo.looca.api.util.Conversor;
 
@@ -34,9 +34,28 @@ public class Howlz {
     Looca looca = new Looca();
 
     // Login
+    private static void LogLogin(String mensagemDoLog) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dataHoraAtual = dateFormat.format(new Date());
+
+        try (BufferedWriter arquivo = new BufferedWriter(new FileWriter("log-login.txt", true))) {
+            arquivo.write(dataHoraAtual + " - " + mensagemDoLog + "\n");
+            System.out.println("Log registrado com sucesso.");
+        } catch (IOException mensagemErro) {
+            System.err.println("Erro ao escrever no arquivo de log: " + mensagemErro.getMessage());
+        }
+    }
+
+
     public Boolean validarLogin(String email, String senha) {
         Integer usuarioTemLogin = usuarioDao.contarPeloEmailESenha(email, senha);
-        return usuarioTemLogin == 1;
+        if (usuarioTemLogin == 1) {
+            LogLogin("Login efetuado pelo usuário do email " + email + " .\n");
+            return true;
+        } else {
+            LogLogin("Falha no login do usuário com o email " + email + " .\n");
+            return false;
+        }
     }
 
     public Boolean computadorNaoCadastrado(String numeroSerial) {
@@ -62,6 +81,20 @@ public class Howlz {
                 idEmpresa
         );
         computadorDao.salvar(computador);
+
+        LogCadastroComputador(computador);
+    }
+
+    private void LogCadastroComputador(Computador computador) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dataHoraAtual = dateFormat.format(new Date());
+
+        try (BufferedWriter arquivo = new BufferedWriter(new FileWriter("log-cadastroComputador.txt", true))) {
+            arquivo.write(dataHoraAtual + " - Novo computador cadastrado: Código Patrimônio " + computador.getCodigoPatrimonio() + " foi adicionado com sucesso.\n");
+            System.out.println("Log de cadastro de computador registrado com sucesso.");
+        } catch (IOException mensagemErro) {
+            System.err.println("Erro ao escrever no arquivo de log: " + mensagemErro.getMessage());
+        }
     }
 
     public String gerarSerial(List<RedeInterface> redeInterfaces) {
@@ -106,6 +139,19 @@ public class Howlz {
         }
     }
 
+
+    private void LogMonitoramentoRAM(Monitoramento monitoramento, Computador computador) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dataHoraAtual = dateFormat.format(new Date());
+
+        try (BufferedWriter arquivo = new BufferedWriter(new FileWriter("log-monitoramentoComponenteRAM.txt", true))) {
+            arquivo.write(dataHoraAtual + " - Monitoramento da RAM: A utilização atual da memória RAM no computador de ID " + computador.getIdComputador() + " é de " +  monitoramento.getValor()+"% \n");
+            System.out.println("Log de monitoramento de componente registrado com sucesso.");
+        } catch (IOException mensagemErro) {
+            System.err.println("Erro ao escrever no arquivo de log: " + mensagemErro.getMessage());
+        }
+    }
+
     public String monitorarComponentes(Componente componente, Computador computador) throws IOException {
         // CPU
         Double valor = 0.;
@@ -135,6 +181,7 @@ public class Howlz {
                         componente.getIdComponente()
                 );
                 monitoramentoComponenteDao.salvar(usoRam);
+                LogMonitoramentoRAM(usoRam, computador);
                 if (valor > 95.) {
                     return String.format("Crítico: Uso de RAM acima de 95%% no computador de código %s", computador.getCodigoPatrimonio());
                 } else if (valor > 90.) {
