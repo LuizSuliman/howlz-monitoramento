@@ -188,10 +188,10 @@ public class Howlz {
                         comando = Runtime.getRuntime().exec("nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits");
                     } else if (componente.getModelo().toLowerCase().contains("intel")) {
                         // comando = Runtime.getRuntime().exec("echo 30.00");
-                        System.out.println("Placa de vídeo não conpátivel com o monitoramento");
+                        System.out.println("Placa de vídeo não conpatível com o monitoramento");
                         return "Placa de vídeo não compatível com o monitoramento";
                     } else {
-                        System.out.println("Placa de vídeo não conpátivel com o monitoramento");
+                        System.out.println("Placa de vídeo não conpatível com o monitoramento");
                         return "GPU Inválida";
                     }
                 } else {
