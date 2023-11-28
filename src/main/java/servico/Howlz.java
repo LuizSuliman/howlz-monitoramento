@@ -14,6 +14,9 @@ import oshi.SystemInfo;
 import oshi.hardware.GraphicsCard;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -301,6 +304,22 @@ public class Howlz {
 
     public void salvarJanelas(List<modelo.Janela> janelas) {
         janelaDao.salvarMultiplos(janelas);
+        LogMonitoramentoJanela(janelas);
+    }
+
+    public static void LogMonitoramentoJanela(List<modelo.Janela> janelas) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dataHoraAtual = dateFormat.format(new Date());
+
+        modelo.Janela janela = new modelo.Janela();
+        Howlz howlz = new Howlz();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("logJanela.txt", true))) {
+            bw.write(dataHoraAtual + " - Monitoramento da Janela: PID: " + janela.getPid() + ", ID Local Janela: " + janela.getIdJanela() + ", Comando: " + janela.getComando() + ", Título: " + janela.getTitulo() + ", Visibilidade: " + janela.getVisibilidade() + ", FK Computador: " + janela.getFkComputador());
+            System.out.println("Log de monitoramento de janela registrado com sucesso.");
+        } catch (IOException mensagemErro) {
+            System.err.println("Erro ao escrever no arquivo de log: " + mensagemErro.getMessage());
+        }
+
     }
 
     public List<String> alertasPassados = new ArrayList<>();

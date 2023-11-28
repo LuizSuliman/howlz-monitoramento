@@ -1,0 +1,1 @@
+2023-11-28 11:11:28 - Monitoramento da Janela: PID: null, ID Local Janela: null, Comando: null, Título: null, Visibilidade: null, FK Computador: null
