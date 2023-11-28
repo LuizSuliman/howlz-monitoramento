@@ -1,2 +1,0 @@
-2023-11-28 11:11:08 - Monitoramento da RAM: A utilização atual da memória RAM no computador de ID 5 é de 86.89165541870743% 
-2023-11-28 11:11:36 - Monitoramento da RAM: A utilização atual da memória RAM no computador de ID 5 é de 88.48046353911802% 

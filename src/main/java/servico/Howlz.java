@@ -8,15 +8,10 @@ import com.github.britooo.looca.api.group.processos.Processo;
 import com.github.britooo.looca.api.group.rede.RedeInterface;
 import dao.*;
 import modelo.*;
-import org.checkerframework.checker.units.qual.A;
-import org.checkerframework.checker.units.qual.C;
 import oshi.SystemInfo;
 import oshi.hardware.GraphicsCard;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,7 +38,6 @@ public class Howlz {
 
         try (BufferedWriter arquivo = new BufferedWriter(new FileWriter("log-login.txt", true))) {
             arquivo.write(dataHoraAtual + " - " + mensagemDoLog + "\n");
-            System.out.println("Log registrado com sucesso.");
         } catch (IOException mensagemErro) {
             System.err.println("Erro ao escrever no arquivo de log: " + mensagemErro.getMessage());
         }
@@ -94,7 +88,6 @@ public class Howlz {
 
         try (BufferedWriter arquivo = new BufferedWriter(new FileWriter("log-cadastroComputador.txt", true))) {
             arquivo.write(dataHoraAtual + " - Novo computador cadastrado: Código Patrimônio " + computador.getCodigoPatrimonio() + " foi adicionado com sucesso.\n");
-            System.out.println("Log de cadastro de computador registrado com sucesso.");
         } catch (IOException mensagemErro) {
             System.err.println("Erro ao escrever no arquivo de log: " + mensagemErro.getMessage());
         }
@@ -149,7 +142,6 @@ public class Howlz {
 
         try (BufferedWriter arquivo = new BufferedWriter(new FileWriter("log-monitoramentoComponenteRAM.txt", true))) {
             arquivo.write(dataHoraAtual + " - Monitoramento da RAM: A utilização atual da memória RAM no computador de ID " + computador.getIdComputador() + " é de " +  monitoramento.getValor()+"% \n");
-            System.out.println("Log de monitoramento de componente registrado com sucesso.");
         } catch (IOException mensagemErro) {
             System.err.println("Erro ao escrever no arquivo de log: " + mensagemErro.getMessage());
         }
@@ -315,7 +307,6 @@ public class Howlz {
         Howlz howlz = new Howlz();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("logJanela.txt", true))) {
             bw.write(dataHoraAtual + " - Monitoramento da Janela: PID: " + janela.getPid() + ", ID Local Janela: " + janela.getIdJanela() + ", Comando: " + janela.getComando() + ", Título: " + janela.getTitulo() + ", Visibilidade: " + janela.getVisibilidade() + ", FK Computador: " + janela.getFkComputador());
-            System.out.println("Log de monitoramento de janela registrado com sucesso.");
         } catch (IOException mensagemErro) {
             System.err.println("Erro ao escrever no arquivo de log: " + mensagemErro.getMessage());
         }
@@ -330,6 +321,7 @@ public class Howlz {
             for (String alertaPassado : alertasPassados) {
                 if (alerta.equalsIgnoreCase(alertaPassado)) {
                     enviadoRecentemente = true;
+                    break;
                 }
             }
             if (!enviadoRecentemente) {

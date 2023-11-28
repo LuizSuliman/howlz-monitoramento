@@ -36,3 +36,9 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Logs ###
+log-cadastroComputador.txt
+log-login.txt
+log-monitoramentoComponenteRAM.txt
+logJanela.txt
