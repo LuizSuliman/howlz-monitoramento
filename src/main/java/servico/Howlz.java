@@ -300,17 +300,17 @@ public class Howlz {
     }
 
     public static void LogMonitoramentoJanela(List<modelo.Janela> janelas) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dataHoraAtual = dateFormat.format(new Date());
 
-        modelo.Janela janela = new modelo.Janela();
-        Howlz howlz = new Howlz();
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("logJanela.txt", true))) {
-            bw.write(dataHoraAtual + " - Monitoramento da Janela: PID: " + janela.getPid() + ", ID Local Janela: " + janela.getIdJanela() + ", Comando: " + janela.getComando() + ", Título: " + janela.getTitulo() + ", Visibilidade: " + janela.getVisibilidade() + ", FK Computador: " + janela.getFkComputador());
-        } catch (IOException mensagemErro) {
-            System.err.println("Erro ao escrever no arquivo de log: " + mensagemErro.getMessage());
+        for (modelo.Janela janela : janelas) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String dataHoraAtual = dateFormat.format(new Date());
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("logJanela.txt", true))) {
+                bw.write(dataHoraAtual + " - Monitoramento da Janela: PID: " + janela.getPid() + ", Comando: " + janela.getComando() + ", Título: " + janela.getTitulo() + ", Visibilidade: " + janela.getVisibilidade() + ", FK Computador: " + janela.getFkComputador() + "\n");
+            } catch (IOException mensagemErro) {
+                System.err.println("Erro ao escrever no arquivo de log: " + mensagemErro.getMessage());
+            }
         }
-
     }
 
     public List<String> alertasPassados = new ArrayList<>();
